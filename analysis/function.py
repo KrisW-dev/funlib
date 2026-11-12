@@ -82,17 +82,22 @@ class Function:
         self._coord_matrix = cm
 
     @property
+    def args(self):
+        """The argument symbols of self."""
+        return self._args
+
+    @property
     def coord_matrix(self):
         """Matrix of self's coordinate functions"""
         return self._coord_matrix
 
     def dom(self):
         """The dimension of self's domain"""
-        return len(self._args)
+        return len(self.args)
 
     def cod(self):
         """The shape (m, n) of self's matrix of coordinate functions."""
-        return shape(self._coord_matrix)
+        return shape(self.coord_matrix)
 
     def _kind(self):
         """
@@ -100,14 +105,14 @@ class Function:
         'vector'  : $m x 1, m > 1$  (canonical column form)
         'other'     : anything else; not diffable in our setting)
         """
-        m, n = shape(self._coord_matrix)
+        m, n = shape(self.coord_matrix)
         if n != 1:
             return "other"
         return "scalar" if m == 1 else "vector"
 
     def _shape_key(self):
         """Registry key: (_kind, dom, m)."""
-        m, n = shape(self._coord_matrix)
+        m, n = shape(self.coord_matrix)
         return (self._kind(), self.dom(), m)
 
     # ---- evaluation ----
@@ -118,14 +123,14 @@ class Function:
         Returns the value of self evaluated on the arguments *vals. This value is symbolic by default and a float if 
         precision is not $\\mathtt{None}$
         """
-        if len(vals) != len(self._args):
+        if len(vals) != len(self.args):
             raise ValueError("Wrong number of arguments")
-        sdict = dict(zip(self._args, vals))
-        m, n = shape(self._coord_matrix)
+        sdict = dict(zip(self.args, vals))
+        m, n = shape(self.coord_matrix)
         if (m, n) == (1, 1):
-            c = self._coord_matrix[0, 0].subs(sdict)
+            c = self.coord_matrix[0, 0].subs(sdict)
             return c if precision is None else N(c, precision)
-        M = self._coord_matrix[:, :].subs(sdict)
+        M = self.coord_matrix[:, :].subs(sdict)
         return M if precision is None else N(M, precision)
 
     def freeze(self, argvals, name=None):
@@ -151,10 +156,10 @@ class Function:
         syms = [s for (s, _) in argvals]
         if duplicates(syms):
             raise ValueError("Duplicate symbols in argvals")
-        if not set(syms) <= set(self._args):
+        if not set(syms) <= set(self.args):
             raise ValueError("Frozen symbols must be among self's arguments")
 
-        newargs = [x for x in self._args if x not in set(syms)]
+        newargs = [x for x in self.args if x not in set(syms)]
         if not newargs:
             raise ValueError("freeze() must leave at least one argument free")
 
@@ -163,7 +168,7 @@ class Function:
             name = f"{self._name}|_{{{frozen}}}"
 
         sdict = dict(argvals)
-        M = self._coord_matrix[:, :].subs(sdict)
+        M = self.coord_matrix[:, :].subs(sdict)
         return Function(name, newargs, M)
 
     # ---- calculus ----
@@ -179,8 +184,8 @@ class Function:
             raise ValueError("diff() is for m x 1 matrices (scalar or vector functions)")
         return Function(
             "D_" + self._name,
-            self._args,
-            [[c.diff(s) for s in self._args] for c in self._coord_matrix.col(0)],
+            self.args,
+            [[c.diff(s) for s in self.args] for c in self.coord_matrix.col(0)],
         )
 
     def grad(self):
@@ -195,9 +200,23 @@ class Function:
         if self._kind() != "scalar":
             raise ValueError("grad() is only for scalar functions; use diff() otherwise")
         D = self.diff()
-        return Function("\\nabla_" + self._name, self._args, D._coord_matrix.T.tolist())
+        return Function("\\nabla_" + self._name, self.args, D.coord_matrix.T.tolist())
 
-    def integrate(self, Phi, s_range, t_range, precision=None):
+    def _integrate_numeric(self, Phi, s_range, t_range):
+        import numpy as np
+        from scipy.integrate import dblquad
+        s, t = Phi.args
+        xs = Phi.coord_matrix[0, 0]
+        ys = Phi.coord_matrix[1, 0]
+        detJ = Phi.diff().coord_matrix.det()
+        integrand_expr = self.coord_matrix[0, 0].subs({self.args[0]: xs, self.args[1]: ys}) * detJ
+        f = lambdify((s, t), integrand_expr, "numpy")
+        def integrand(t, s):
+            return float(f(s, t))
+        result, _ = dblquad(integrand,s_range[0], s_range[1],lambda _: t_range[0], lambda _: t_range[1])
+        return result
+
+    def integrate(self, Phi, s_range, t_range, numeric=False):
         """
         Preconditions: 
         
@@ -217,30 +236,45 @@ class Function:
         
         The value here is by default a SymPy expression (the exact integral, or an unevaluated
         integral if SymPy cannot do it). **Warning**: performance can be a bottleneck, even if SymPy is capable
-        of providing an exact value. If precision is not $\\mathtt{None}$, the method returns a float.
+        of providing an exact value. If `numeric = True`, the method returns a float.
         """
+        # if self._kind() != "scalar" or self.dom() != 2:
+        #     raise ValueError("integrate() needs a scalar function R^2 -> R")
+        # if Phi.dom() != 2 or Phi.cod() != (2, 1):
+        #     raise ValueError("parametrization Phi must be R^2 -> R^2 (2 x 1)")
+
+        # s, t = Phi._args
+        # xs = Phi.coord_matrix[0, 0]
+        # ys = Phi.coord_matrix[1, 0]
+
+        # detJ = Phi.diff().coord_matrix.det()
+
+        # x_expr = self.coord_matrix[0, 0]
+        # integrand = x_expr.subs({self.args[0]: xs, self.args[1]: ys}) * detJ
+        # result = sp_integrate(integrand, (s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
+
+        # return result if precision is None else N(result, precision)
+
         if self._kind() != "scalar" or self.dom() != 2:
             raise ValueError("integrate() needs a scalar function R^2 -> R")
         if Phi.dom() != 2 or Phi.cod() != (2, 1):
             raise ValueError("parametrization Phi must be R^2 -> R^2 (2 x 1)")
 
-        s, t = Phi._args
+        if numeric:
+            return self._integrate_numeric(Phi, s_range, t_range)
+
+        s, t = Phi.args
         xs = Phi.coord_matrix[0, 0]
         ys = Phi.coord_matrix[1, 0]
-
         detJ = Phi.diff().coord_matrix.det()
-
-        x_expr = self.coord_matrix[0, 0]
-        integrand = x_expr.subs({self._args[0]: xs, self._args[1]: ys}) * detJ
-        result = sp_integrate(integrand, (s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
-
-        return result if precision is None else N(result, precision)
+        integrand = self.coord_matrix[0, 0].subs({self.args[0]: xs, self.args[1]: ys}) * detJ
+        return sp_integrate(integrand,(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
 
     def _surface_area_numeric(self, u_range, v_range, n=200):
         import numpy as np
         from scipy.integrate import dblquad
 
-        u, v = self._args
+        u, v = self.args
         x_expr, y_expr, z_expr = (self.coord_matrix[i, 0] for i in range(3))
         Phi_u = [x_expr.diff(u), y_expr.diff(u), z_expr.diff(u)]
         Phi_v = [x_expr.diff(v), y_expr.diff(v), z_expr.diff(v)]
@@ -253,12 +287,11 @@ class Function:
             pv = np.array(f_v(u, v))
             return float(np.linalg.norm(np.cross(pu, pv)))
 
-        result, _ = dblquad(area_elem,
-                            u_range[0], u_range[1],   # inner: u
+        result, _ = dblquad(area_elem,u_range[0], u_range[1],   # inner: u
                             lambda _: v_range[0], lambda _: v_range[1])  # outer: v
         return result
 
-    def surface_area(self, u_range, v_range, precision=None, numeric = True):
+    def surface_area(self, u_range, v_range, numeric = True):
         """
         Precondition: self must be a vector-valued function $f(u,v): \\mathbb{R}^2 \\rightarrow \\mathbb{R}^3$ 
         
@@ -267,7 +300,8 @@ class Function:
             \\int_{\\mathbf{D}} \\| \\Phi_u \\times \\Phi_v \\| \\, du \\, dv 
         $$
 
-        where $\\Phi_u$ and $\\Phi_v$ are the partial derivatives of the coordinate functions. The value here is by default a SymPy expression
+        where $\\Phi_u$ and $\\Phi_v$ are the partial derivatives of the coordinate functions. The value here is by default a 
+        float. If `numeric=False` it is a SymPy expression
         (exact, or an unevaluated integral if
         SymPy cannot do it). **Warning**: performanace can be a 
         bottleneck, even if SymPy is capable of providing an exact value. If precision is not $\\mathtt{None$}, the method returns a float. 
@@ -280,7 +314,7 @@ class Function:
         if numeric:
             return self._surface_area_numeric(u_range, v_range)
 
-        u, v = self._args
+        u, v = self.args
         x_expr = self.coord_matrix[0, 0]
         y_expr = self.coord_matrix[1, 0]
         z_expr = self.coord_matrix[2, 0]
@@ -289,10 +323,10 @@ class Function:
         Phi_v = Matrix([x_expr.diff(v), y_expr.diff(v), z_expr.diff(v)])
         area_elem = expand(trigsimp(Phi_u.cross(Phi_v).norm()))
 
-        result = sp_integrate(area_elem, (u, u_range[0], u_range[1]),(v, v_range[0], v_range[1]))
-        return result if precision is None else N(result, precision)
+        return sp_integrate(area_elem, (u, u_range[0], u_range[1]),(v, v_range[0], v_range[1]))
+        
 
-    def volume(self, r_range, s_range, t_range, precision=None, numeric=False):
+    def volume(self, r_range, s_range, t_range, numeric=True):
         """
         Precondition: self must be a vector-valued function $f(r,s,t): \\mathbb{R}^3 \\rightarrow \\mathbb{R}^3$ 
         which is *orientation-preserving* over 
@@ -302,11 +336,10 @@ class Function:
         $$
             \\int_\\mathbf{D} det(D_f) \\, dr \\, ds \\, dt
         $$
-        The value here is by default a SymPy expression (exact, or an unevaluated Integral if SymPy cannot do it). 
+        The value here is by default a float. If `numeric = False` it is a
+        SymPy expression (exact, or an unevaluated Integral if SymPy cannot do it). 
         **Warning**: performanace can be a 
-        bottleneck, even if SymPy is capable of providing an exact value. If precision is 
-        not $\\mathtt{None}$, the method returns a float.
-        
+        bottleneck, even if SymPy is capable of providing an exact value. 
         
         Notice that unlike what happens in the case of a surface area where an explicit domain parametrisation must be provided, in the case of 
         a volume the parametrisation in question is the function itself. 
@@ -314,34 +347,27 @@ class Function:
         if self._kind() != "vector" or self.dom() != 3 or self.cod() != (3, 1):
             raise ValueError("volume() needs a parametric solid R^3 -> R^3 (3 x 1)")
 
-        r, s, t = self._args
+        r, s, t = self.args
         detJ = self.diff().coord_matrix.det()
 
         if numeric:
             return self._volume_numeric(r_range, s_range, t_range)
 
         integrand = expand(trigsimp(detJ))
-        result = sp_integrate(integrand,
-                            (r, r_range[0], r_range[1]),
-                            (s, s_range[0], s_range[1]),
-                            (t, t_range[0], t_range[1]))
-        return result if precision is None else N(result, precision)
+        return sp_integrate(integrand,(r, r_range[0], r_range[1]),(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
 
     def _volume_numeric(self, r_range, s_range, t_range):
         import numpy as np
         from scipy.integrate import tplquad
 
-        r, s, t = self._args
+        r, s, t = self.args
         detJ_expr = self.diff().coord_matrix.det()
         f_det = lambdify((r, s, t), detJ_expr, "numpy")
 
         def integrand(t, s, r):          # tplquad: inner r, middle s, outer t
             return float(f_det(r, s, t))
 
-        result, _ = tplquad(integrand,
-                            r_range[0], r_range[1],
-                            lambda _: s_range[0], lambda _: s_range[1],
-                            lambda _, __: t_range[0], lambda _, __: t_range[1])
+        result, _ = tplquad(integrand,r_range[0], r_range[1],lambda _: s_range[0], lambda _: s_range[1], lambda _, __: t_range[0], lambda _, __: t_range[1])
         return result
 
     # ==== Plotting ====
@@ -364,13 +390,13 @@ class Function:
         rbb = "\\mathbb{R}"
         closingstr = "\\end{array}"
 
-        dom = len(self._args)
+        dom = len(self.args)
         if dom > 1:
             domstr = rbb + "^{" + str(dom) + "}"
         else:
             domstr = rbb
 
-        m, n = shape(self._coord_matrix)
+        m, n = shape(self.coord_matrix)
 
         if (m, n) == (1, 1):
             codstr = rbb
@@ -380,15 +406,15 @@ class Function:
             else:
                 codstr = rbb + "^{" + str(m) + "\\times" + str(n) + "}"
 
-        if len(self._args) == 1:
-            largs = latex(self._args[0])
+        if len(self.args) == 1:
+            largs = latex(self.args[0])
         else:
-            largs = latex(Matrix(self._args))
+            largs = latex(Matrix(self.args))
 
         if (m, n) == (1, 1):
-            lexpr = latex(self._coord_matrix[0, 0])
+            lexpr = latex(self.coord_matrix[0, 0])
         else:
-            lexpr = latex(self._coord_matrix)
+            lexpr = latex(self.coord_matrix)
 
         return (f"{openingstr} {self._name} : &{domstr} & \\longrightarrow & {codstr} "
                 f"\\\\ & {largs} & \\mapsto & {lexpr} {closingstr}")
