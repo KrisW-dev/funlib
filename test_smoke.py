@@ -52,14 +52,6 @@ def check(name, fn, timeout=60):
         signal.alarm(0)
         signal.signal(signal.SIGALRM, old)
 
-# def check(name, fn):
-#     try:
-#         fn()
-#         print(f"  ok   {name}")
-#     except Exception as e:
-#         failures.append((name, e))
-#         print(f"  FAIL {name}: {type(e).__name__}: {e}")
-
 def approx(a, b, tol=1e-6):
     if abs(float(a) - float(b)) > tol:
         raise AssertionError(f"{a} != {b} (tol {tol})")
@@ -129,7 +121,7 @@ def t_plane():
     c = Canvas3D()
     c.add(Plane(p=(0, 0, 3), normal=(0, 0, 1), size=10, alpha=0.6))
     c.close()
-check("Plane (flat, aspect)", t_plane)
+check("Plane (pinned limits)", t_plane)
 
 def t_mixed_3d():
     c = Canvas3D()
@@ -246,3 +238,31 @@ if failures:
     sys.exit(1)
 else:
     print("all checks passed")
+
+def t_multipanel():
+    c = Canvas3D(xlim=(-1.2, 1.2), ylim=(-1.2, 1.2), zlim=(-1.2, 1.2),
+                 nrows=1, ncols=3, axes=False)
+    for i in range(3):
+        c.add(Point3D(0, 0, 0, color="red"), panel=i)
+        c.set_panel_title(i, f"p{i}")
+    c.close()
+check("Canvas3D multi-panel", t_multipanel)
+
+def t_panel_out_of_range():
+    c = Canvas3D(nrows=1, ncols=3)
+    try:
+        c.add(Point3D(0, 0, 0), panel=5)
+    except ValueError:
+        c.close()
+        return
+    raise AssertionError("expected ValueError for panel out of range")
+check("Canvas3D panel out of range", t_panel_out_of_range)
+
+def t_canvas_grid_axes():
+    c = Canvas3D(grid=False)
+    c.add(Point3D(0, 0, 0), panel=0)
+    c.close()
+    c = Canvas3D(axes=False)
+    c.add(Point3D(0, 0, 0), panel=0)
+    c.close()
+check("Canvas3D grid/axes flags", t_canvas_grid_axes)

@@ -83,76 +83,74 @@ class Canvas2D:
     def close(self):
         plt.close(self.fig)
 
-
-# ==== Canvas3D ====
 class Canvas3D:
     """
-    A 3D matplotlib figure/axes to which Renderables can be added.
+    A 3D matplotlib figure with a grid of panels.
 
-    Parameters
-    ----------
-    xlim, ylim, zlim : (float, float), optional
-    elev, azim, roll : float
-        Initial camera angles. Use set_view() to change after creation.
-    figsize : (float, float), optional
-    title : str, optional
+    With the defaults (nrows=ncols=1) there is a single panel and
+    add(obj) draws on it, as before. With nrows=1, ncols=3, use
+    add(obj, panel=0/1/2) to place each object in a different panel.
+
+    Panel i is row i // ncols, column i % ncols (row-major).
+    Each panel has its own box aspect, computed from the limits given.
     """
 
-    def __init__(self, xlim=None, ylim=None, zlim=None, elev=30, azim=-60, roll=0,box_aspect=None, figsize=None, title=None):
+    def __init__(self, xlim=(-1, 1), ylim=(-1, 1), zlim=(-1, 1),nrows=1, ncols=1, elev=30, azim=-60, roll=0,figsize=None, title=None, grid=True, axes=True):
         self.fig = plt.figure(figsize=figsize)
-        self.ax = self.fig.add_subplot(111, projection="3d")
+        self._axes = [
+            self.fig.add_subplot(nrows, ncols, i + 1, projection="3d")
+            for i in range(nrows * ncols)
+        ]
+        self._ncols = ncols
+        self.ax = self._axes[0]
         self._children = []
-        if xlim is not None:
-            self.ax.set_xlim(xlim)
-        if ylim is not None:
-            self.ax.set_ylim(ylim)
-        if zlim is not None:
-            self.ax.set_zlim(zlim)
+
+        dx = xlim[1] - xlim[0]
+        dy = ylim[1] - ylim[0]
+        dz = zlim[1] - zlim[0]
+        m = max(dx, dy, dz)
+        box_aspect = (dx/m, dy/m, dz/m) if m > 0 else (1, 1, 1)
+
+        for ax in self._axes:
+            ax.set_xlim(xlim)
+            ax.set_ylim(ylim)
+            ax.set_zlim(zlim)
+            ax.set_box_aspect(box_aspect)
+            if axes:
+                ax.grid(grid)
+            else:
+                ax.set_axis_off()
+
         if title is not None:
             self.ax.set_title(title)
-        # Remember whether the user pinned the box aspect.
-        self._explicit_box_aspect = box_aspect is not None
-        if box_aspect is not None:
-            self.ax.set_box_aspect(box_aspect)
         self.set_view(elev=elev, azim=azim, roll=roll)
 
-    def add(self, plot_obj):
+    def _panel_axes(self, panel):
+        if not (0 <= panel < len(self._axes)):
+            raise ValueError(f"panel {panel} out of range (0..{len(self._axes)-1})")
+        return self._axes[panel]
+
+    def add(self, plot_obj, panel=0):
         if not hasattr(plot_obj, "render"):
-            raise TypeError("expected a Renderable with .render(ax, **kw)")
-        plot_obj.render(self.ax)
+            raise TypeError("expected a Renderable with .render(ax)")
+        ax = self._panel_axes(panel)
+        plot_obj.render(ax)
         self._children.append(plot_obj)
-        self._update_box_aspect()
         return plot_obj
 
-    def _update_box_aspect(self):
-        if self._explicit_box_aspect:
-            return
-        x0, x1 = self.ax.get_xlim()
-        y0, y1 = self.ax.get_ylim()
-        z0, z1 = self.ax.get_zlim()
-        dx, dy, dz = x1 - x0, y1 - y0, z1 - z0
-        m = max(dx, dy, dz)
-        if m > 0:
-            eps = 1e-2
-            self.ax.set_box_aspect((max(dx/m, eps), max(dy/m, eps), max(dz/m, eps)))
+    def set_panel_title(self, panel, title):
+        self._panel_axes(panel).set_title(title)
 
     def set_view(self, elev=None, azim=None, roll=None):
-        """Update the camera angle after the canvas has been created."""
         kw = {}
-        if elev is not None:
-            kw["elev"] = elev
-        if azim is not None:
-            kw["azim"] = azim
-        if roll is not None:
-            kw["roll"] = roll
+        if elev is not None: kw["elev"] = elev
+        if azim is not None: kw["azim"] = azim
+        if roll is not None: kw["roll"] = roll
         if kw:
-            self.ax.view_init(**kw)
+            for ax in self._axes:
+                ax.view_init(**kw)
 
     def _ipython_display_(self):
-        """
-        Render the figure automatically when the canvas is the last
-        expression of a Jupyter cell.
-        """
         plt.show()
 
     def show(self):
