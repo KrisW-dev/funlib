@@ -94,11 +94,11 @@ def run_smoke(cwd, label):
 # ---- build ----
 
 def main():
-    # 1. dev-tree smoke test
+    # dev-tree smoke test
     if not run_smoke(ROOT, "dev tree"):
         sys.exit(1)
 
-    # 2. build merged files
+    # build merged files
     os.makedirs(DIST, exist_ok=True)
     if os.path.isdir(RELEASE_DIR):
         shutil.rmtree(RELEASE_DIR)
@@ -119,20 +119,20 @@ def main():
         f.write(graphics_py)
 
     # 3. README
-    readme = (
-        f"funlib {VERSION}\n"
-        f"{'=' * (len('funlib ') + len(VERSION))}\n\n"
-        f"Two files: analysis.py, graphics.py. Put them next to your notebook.\n\n"
-        f"In a cell:\n\n"
-        f"    from analysis import Function\n"
-        f"    import graphics\n\n"
-        f"Requires: sympy, numpy, matplotlib, scipy.\n"
-        f"Optional: ipympl (interactive 3D; run `%matplotlib widget`).\n"
-    )
-    with open(os.path.join(RELEASE_DIR, "README.txt"), "w", encoding="utf-8") as f:
-        f.write(readme)
+    # readme = (
+    #     f"funlib {VERSION}\n"
+    #     f"{'=' * (len('funlib ') + len(VERSION))}\n\n"
+    #     f"Two files: analysis.py, graphics.py. Put them next to your notebook.\n\n"
+    #     f"In a cell:\n\n"
+    #     f"    from analysis import Function\n"
+    #     f"    import graphics\n\n"
+    #     f"Requires: sympy, numpy, matplotlib, scipy.\n"
+    #     f"Optional: ipympl (interactive 3D; run `%matplotlib widget`).\n"
+    # )
+    # with open(os.path.join(RELEASE_DIR, "README.txt"), "w", encoding="utf-8") as f:
+    #     f.write(readme)
 
-    # 4. merged-files smoke test in a temp dir
+    # merged-files smoke test in a temp dir
     with tempfile.TemporaryDirectory() as tmp:
         shutil.copy(os.path.join(RELEASE_DIR, "analysis.py"), tmp)
         shutil.copy(os.path.join(RELEASE_DIR, "graphics.py"), tmp)
@@ -142,10 +142,10 @@ def main():
             sys.exit(1)
 
     # 5. zip
-    zipname = os.path.join(DIST, f"{RELEASE_NAME}.zip")
-    with zipfile.ZipFile(zipname, "w", zipfile.ZIP_DEFLATED) as z:
-        for name in ("analysis.py", "graphics.py", "README.txt"):
-            z.write(os.path.join(RELEASE_DIR, name), arcname=name)
+    # zipname = os.path.join(DIST, f"{RELEASE_NAME}.zip")
+    # with zipfile.ZipFile(zipname, "w", zipfile.ZIP_DEFLATED) as z:
+    #     for name in ("analysis.py", "graphics.py", "README.txt"):
+    #         z.write(os.path.join(RELEASE_DIR, name), arcname=name)
 
     print()
     print(f"built: {os.path.join(RELEASE_DIR, 'analysis.py')}")

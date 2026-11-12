@@ -16,6 +16,10 @@ dist/
 
 tests/
 
+# Notebooks, no version control needed
+
+notebooks
+
 # macOS
 .DS_Store
 
