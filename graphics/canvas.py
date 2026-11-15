@@ -54,7 +54,7 @@ class _CanvasBase:
         self._panel_axes(panel).set_title(title)
 
     def _ipython_display_(self):
-        plt.show()
+        self.show()
 
     def show(self):
         plt.show()

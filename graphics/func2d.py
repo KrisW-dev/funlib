@@ -244,7 +244,7 @@ class VectorField2D(Renderable):
                 "along= must be a Function R -> R^2 (a parametric curve); "
                 "to overlay its plot, add the curve separately"
             )
-        t = np.linspace(t_range[0], t_range[1], n_samples)
+        t = np.linspace(float(t_range[0]), float(t_range[1]), n_samples)
         x, y = _numeric(along)(t)
         return x, y
 

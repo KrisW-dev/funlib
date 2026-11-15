@@ -113,3 +113,23 @@ class Polygon2D(Renderable):
         ax.add_patch(patch)
         return patch
 
+class Polyline2D(Renderable):
+    """Open polyline through the given points (list of (x, y)).
+
+    Unlike Polygon2D, the path is not closed: the last point is not
+    connected back to the first. Use for trajectories, paths, sampled
+    curves — anything that shouldn't loop back.
+    """
+
+    def __init__(self, points, **style):
+        self.points = list(points)
+        style.setdefault("color", "black")
+        style.setdefault("zorder", 4)
+        self.style = style
+
+    def render(self, ax, **kw):
+        merged = {**self.style, **kw}
+        xs = [p[0] for p in self.points]
+        ys = [p[1] for p in self.points]
+        return ax.plot(xs, ys, **merged)
+

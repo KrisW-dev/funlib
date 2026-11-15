@@ -93,6 +93,7 @@ def t_mixed_2d():
     c.add(Point2D(1, 1, color="red"))
     c.add(Vector2D((0, 0), (1, 0), color="green"))
     c.add(Line2D((0, 0), (1, 1), color="black"))
+    c.add(Polygon2D([(0, 0), (1, 0), (1, 1)]))
     c.close()
 check("mixed 2D canvas", t_mixed_2d)
 
@@ -454,6 +455,95 @@ def t_flux_across_numeric():
     gamma = Function("gamma", [t], [cos(t), sin(t)])
     approx(F.flux_across(gamma, (0, 2*pi), numeric=True), pi)
 check("flux_across: numeric matches exact", t_flux_across_numeric)
+
+# ---- div and curl ----
+def t_div_linear():
+    F = Function("F", [x, y], [x, y])
+    approx(F.div().eval(0, 0), 2)
+check("div: identity field, R^2", t_div_linear)
+
+def t_div_area_field():
+    F = Function("F", [x, y], [x/2, y/2])
+    approx(F.div().eval(0, 0), 1)
+check("div: (x/2, y/2)", t_div_area_field)
+
+def t_div_rotation():
+    F = Function("F", [x, y], [-y, x])
+    approx(F.div().eval(1, 1), 0)
+check("div: rotation field is divergence-free", t_div_rotation)
+
+def t_div_3d():
+    F = Function("F", [x, y, z], [x, y, z])
+    approx(F.div().eval(0, 0, 0), 3)
+check("div: identity field, R^3", t_div_3d)
+
+def t_div_components():
+    # F = (y, x) → ∂y/∂x + ∂x/∂y = 0; wrong pairing would give 2
+    F = Function("F", [x, y], [y, x])
+    approx(F.div().eval(1, 1), 0)
+check("div: component/coordinate pairing", t_div_components)
+
+def t_div_preconditions():
+    F = Function("F", [t], [cos(t), sin(t)])
+    try:
+        F.div()
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError for non-square field")
+
+    F = Function("F", [x, y], [x, y, x + y])
+    try:
+        F.div()
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError for F: R^2 -> R^3")
+check("div: preconditions rejected", t_div_preconditions)
+
+def t_curl_rotation():
+    F = Function("F", [x, y], [-y, x])
+    approx(F.curl().eval(0, 0), 2)
+check("curl: rotation field", t_curl_rotation)
+
+def t_curl_gradient():
+    F = Function("F", [x, y], [x, y])
+    approx(F.curl().eval(1, 1), 0)
+check("curl: gradient field is curl-free", t_curl_gradient)
+
+def t_curl_components():
+    # F = (y², x²) → curl = 2x - 2y; sign flips at (1,0) vs (0,1)
+    F = Function("F", [x, y], [y**2, x**2])
+    approx(F.curl().eval(1, 0), 2)
+    approx(F.curl().eval(0, 1), -2)
+check("curl: component pairing and sign", t_curl_components)
+
+def t_curl_preconditions():
+    F = Function("F", [x, y, z], [x, y, z])
+    try:
+        F.curl()
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError for 3D field")
+
+    F = Function("F", [x, y], [x + y])
+    try:
+        F.curl()
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError for scalar function")
+check("curl: preconditions rejected", t_curl_preconditions)
+
+# ---- SymPy bounds ----
+
+def t_vectorfield2d_along_sympy_bounds():
+    # t_range with sympy.pi bound — regression test for np.linspace float coercion
+    F = Function("F", [x, y], [-y, x])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    c = Canvas2D(aspect="equal")
+    c.add(F.plot("2d", along=gamma, t_range=(0, 2*pi), n_samples=20))
+    c.close()
+check("VectorField2D along= with SymPy t_range", t_vectorfield2d_along_sympy_bounds)
 
 # ---- display protocols ----
 def t_repr_latex():

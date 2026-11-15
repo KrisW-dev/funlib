@@ -6,7 +6,7 @@ API user is not required to know any of this."""
 from .canvas import Canvas2D, Canvas3D, Renderable
 from .func2d import Curve2D, ParametricCurve2D, Implicit2D, VectorField2D
 from .func3d import Surface, ParametricCurve3D, ParametricSurface3D
-from .objects2d import Point2D, Line2D, Vector2D, Polygon2D
+from .objects2d import Point2D, Line2D, Vector2D, Polygon2D, Polyline2D
 from .objects3d import Point3D, Line3D, Vector3D, Plane
 
 from analysis.function import _PLOT_REGISTRY
@@ -32,7 +32,7 @@ __all__ = [
     # 3D function plots
     "Surface", "ParametricCurve3D", "ParametricSurface3D",
     # 2D objects
-    "Point2D", "Line2D", "Vector2D", "Polygon2D",
+    "Point2D", "Line2D", "Vector2D", "Polygon2D", "Polyline2D",
     # 3D objects
     "Point3D", "Line3D", "Vector3D", "Plane",
 ]

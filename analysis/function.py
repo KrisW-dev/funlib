@@ -530,6 +530,44 @@ class Function:
                         float(t_range[0]), float(t_range[1]))
         return result
 
+    def div(self):
+        r"""
+        Divergence of a vector field:
+
+            $\nabla \cdot F = \sum_{i=1}^{n} \frac{\partial F_i}{\partial x_i}$
+
+        Precondition: self is a vector field $F: \mathbb{R}^n \to \mathbb{R}^n$.
+
+        Returns a scalar function $\mathbb{R}^n \to \mathbb{R}$ (a new Function).
+        """
+        if self._kind() != "vector" or self.cod() != (self.dom(), 1):
+            raise ValueError("div() needs a vector field F: R^n -> R^n")
+        n = self.dom()
+        expr = sum(self.coord_matrix[i, 0].diff(self.args[i]) for i in range(n))
+        return Function("div " + self._name, self.args, [expr])
+
+    def curl(self):
+        r"""
+        Curl of a plane vector field, in its scalar form:
+
+            $\operatorname{curl} F = \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y}$
+
+        Precondition: self is a vector field $F: \mathbb{R}^2 \to \mathbb{R}^2$.
+
+        Returns a scalar function $\mathbb{R}^2 \to \mathbb{R}$ (a new Function).
+
+        Note: in 2D the curl of a vector field is a scalar, not a vector — it is
+        the $z$-component of the 3D curl of $(F_1, F_2, 0)$. The 3D vector-valued
+        curl is a separate method (`curl3d`) to come.
+        """
+        if self._kind() != "vector" or self.dom() != 2 or self.cod() != (2, 1):
+            raise ValueError("curl() needs a plane vector field F: R^2 -> R^2")
+        P = self.coord_matrix[0, 0]
+        Q = self.coord_matrix[1, 0]
+        x1, x2 = self.args
+        expr = Q.diff(x1) - P.diff(x2)
+        return Function("curl " + self._name, self.args, [expr])
+
     # ==== Plotting ====
 
     def plot(self, plot_classification, **kwargs):
