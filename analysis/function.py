@@ -253,6 +253,111 @@ class Function:
         integrand = self.coord_matrix[0, 0].subs({self.args[0]: xs, self.args[1]: ys}) * detJ
         return sp_integrate(integrand,(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
 
+    def _line_integrand(self, gamma):
+        """
+        self: vector field
+        gamma: parametric curve
+
+        Common setup for integrate_along: returns (t, integrand_expr) where
+        integrand_expr is the scalar F(γ(t)) · γ'(t) in the parameter t.
+
+        Shared by the symbolic and numeric paths so they cannot diverge.
+        """
+        t = gamma.args[0]
+        subs = {fa: gc for fa, gc in zip(self.args, gamma.coord_matrix.col(0))}
+        gamma_prime = gamma.diff().coord_matrix.col(0)
+        integrand = sum(
+            F_i.subs(subs) * gp_i
+            for F_i, gp_i in zip(self.coord_matrix.col(0), gamma_prime)
+        )
+        return t, integrand
+
+    def integrate_along(self, gamma, t_range, numeric=False):
+        """
+            Line integral of a vector field:  ∫_γ F · dr = ∫_{t0}^{t1} F(γ(t)) · γ'(t) dt.
+    
+            Preconditions:
+            (i)  self  is a vector field F: R^n -> R^n  (vector, cod == (n, 1))
+            (ii) gamma is a curve γ: R -> R^n matching F's dimension
+    
+            Orientation: reversing t_range reverses the sign, as expected.
+        """
+        n = self.dom()
+        if self._kind() != "vector" or self.cod() != (n, 1):
+            raise ValueError("integrate_along needs a vector field F: R^n -> R^n")
+        if gamma._kind() != "vector" or gamma.dom() != 1 or gamma.cod() != (n, 1):
+            raise ValueError("gamma must be a curve R -> R^n matching F's dimension")
+              
+        if numeric:
+            return self._integrate_along_numeric(gamma, t_range)
+        t, integrand = self._line_integrand(gamma)
+        return sp_integrate(expand(trigsimp(integrand)),(t, t_range[0], t_range[1]))
+
+    def _integrate_along_numeric(self, gamma, t_range):
+        import numpy as np
+        from scipy.integrate import quad
+        t, integrand_expr = self._line_integrand(gamma)
+        f = lambdify(t, integrand_expr, "numpy")
+        result, _ = quad(lambda tv: float(f(tv)),float(t_range[0]), float(t_range[1]))
+        return result
+
+    def _integrate_over_numeric(self, S, u_range, v_range):
+        """Numeric flux via scipy.integrate.dblquad. Lazy imports."""
+        from scipy.integrate import dblquad
+        u, v, integrand_expr = self._flux_integrand(S)
+        f = lambdify((u, v), integrand_expr, "numpy")
+
+        def integrand(v_val, u_val):          # dblquad: inner u, outer v
+            return float(f(u_val, v_val))
+
+        result, _ = dblquad(
+            integrand,
+            float(u_range[0]), float(u_range[1]),
+            lambda _: float(v_range[0]), lambda _: float(v_range[1]),
+        )
+        return result
+
+    def integrate_over(self, S, u_range, v_range, numeric=False):
+        r"""
+        Flux of a vector field across a parametric surface:
+
+            $\int_S F \cdot dS = \int_{u_0}^{u_1} \int_{v_0}^{v_1} F(S(u,v)) \cdot (S_u \times S_v) \, dv \, du$
+
+        Preconditions:
+        (i)  self is a vector field $F : \mathbb{R}^3 \to \mathbb{R}^3$;
+        (ii) S is a parametric surface $S : \mathbb{R}^2 \to \mathbb{R}^3$;
+        (iii) the orientation of S (given by $S_u \times S_v$) is the one
+                the user intends — reversing a parameter range reverses the sign.
+
+        The result may be negative; that is the orientation, not an error.
+        """
+        if self._kind() != "vector" or self.dom() != 3 or self.cod() != (3, 1):
+            raise ValueError("integrate_over needs a vector field F: R^3 -> R^3")
+        if S._kind() != "vector" or S.dom() != 2 or S.cod() != (3, 1):
+            raise ValueError("S must be a parametric surface R^2 -> R^3 (3 x 1)")
+
+        if numeric:
+            return self._integrate_over_numeric(S, u_range, v_range)
+
+        u, v, integrand = self._flux_integrand(S)
+        return sp_integrate(expand(trigsimp(integrand)),
+                            (u, u_range[0], u_range[1]),
+                            (v, v_range[0], v_range[1]))
+
+    def _flux_integrand(self, S):
+        """Returns (u, v, F(S(u,v)) · (S_u × S_v))."""
+        u, v = S.args
+        S_coords = S.coord_matrix.col(0)
+        subs = {fa: sc for fa, sc in zip(self.args, S_coords)}
+        S_u = [c.diff(u) for c in S_coords]
+        S_v = [c.diff(v) for c in S_coords]
+        cross = [S_u[1]*S_v[2] - S_u[2]*S_v[1],
+                S_u[2]*S_v[0] - S_u[0]*S_v[2],
+                S_u[0]*S_v[1] - S_u[1]*S_v[0]]
+        integrand = sum(F_i.subs(subs) * c_i
+                        for F_i, c_i in zip(self.coord_matrix.col(0), cross))
+        return u, v, integrand
+
     def _surface_area_numeric(self, u_range, v_range, n=200):
         import numpy as np
         from scipy.integrate import dblquad

@@ -4,7 +4,7 @@ It is technical documentation, an
 API user is not required to know any of this."""
 
 from .canvas import Canvas2D, Canvas3D, Renderable
-from .func2d import Curve2D, ParametricCurve2D, Implicit2D
+from .func2d import Curve2D, ParametricCurve2D, Implicit2D, VectorField2D
 from .func3d import Surface, ParametricCurve3D, ParametricSurface3D
 from .objects2d import Point2D, Line2D, Vector2D, Polygon2D
 from .objects3d import Point3D, Line3D, Vector3D, Plane
@@ -20,7 +20,7 @@ _PLOT_REGISTRY.update({
     ("vector", 2, 3): {"2d": None,              "3d": ParametricSurface3D},
 
     # ---- phase 2 (uncomment when VectorField2D / VectorField3D exist) ----
-    # ("vector", 2, 2): {"2d": VectorField2D,   "3d": None},   # incl. grad() of R^2 -> R
+    ("vector", 2, 2): {"2d": VectorField2D,   "3d": None},   # incl. grad() of R^2 -> R
     # ("vector", 3, 3): {"2d": None,            "3d": VectorField3D},  # incl. grad() of R^3 -> R
 })
 

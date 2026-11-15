@@ -280,6 +280,111 @@ def t_freeze_bad():
     raise AssertionError("expected ValueError for unknown frozen symbol")
 check("freeze rejects unknown symbol", t_freeze_bad)
 
+# ---- line integrals of vector fields ----
+def t_line_rotation_circle():
+    # F = (-y, x), unit circle → 2π
+    F = Function("F", [x, y], [-y, x])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    approx(F.integrate_along(gamma, (0, 2*pi)), 2*pi)
+check("integrate_along: rotation, unit circle", t_line_rotation_circle)
+
+def t_line_conservative_closed():
+    # F = (x, y) = ∇(½(x²+y²)), closed curve → 0
+    F = Function("F", [x, y], [x, y])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    approx(F.integrate_along(gamma, (0, 2*pi)), 0)
+check("integrate_along: conservative, closed", t_line_conservative_closed)
+
+def t_line_parabola_poly():
+    # F = (-y, x), P(t) = (t²-3, 2t+1), t ∈ [-2, 3] → -175/3
+    F = Function("F", [x, y], [-y, x])
+    P = Function("P", [t], [t**2 - 3, 2*t + 1])
+    approx(F.integrate_along(P, (-2, 3)), Rational(-175, 3))
+check("integrate_along: parabola (exact, signed)", t_line_parabola_poly)
+
+def t_line_3d_helix():
+    # G = (-y, x, z), γ(t) = (cos t, sin t, t), t ∈ [0, 2π] → 2π + 2π²
+    G = Function("G", [x, y, z], [-y, x, z])
+    gamma = Function("gamma", [t], [cos(t), sin(t), t])
+    approx(G.integrate_along(gamma, (0, 2*pi)), 2*pi + 2*pi**2)
+check("integrate_along: 3D helix", t_line_3d_helix)
+
+def t_line_orientation_reversal():
+    # reversing t_range negates
+    F = Function("F", [x, y], [-y, x])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    I_fwd = F.integrate_along(gamma, (0, 2*pi))
+    I_rev = F.integrate_along(gamma, (2*pi, 0))
+    approx(I_fwd + I_rev, 0)
+check("integrate_along: orientation reversal", t_line_orientation_reversal)
+
+def t_line_mismatched_dim():
+    # F: R² → R², γ: R → R³ — must raise
+    F = Function("F", [x, y], [-y, x])
+    gamma = Function("gamma", [t], [cos(t), sin(t), t])
+    try:
+        F.integrate_along(gamma, (0, 2*pi))
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError for dimension mismatch")
+check("integrate_along: dimension mismatch rejected", t_line_mismatched_dim)
+
+def t_line_numeric_agrees():
+    # numeric path must match the exact -175/3
+    F = Function("F", [x, y], [-y, x])
+    P = Function("P", [t], [t**2 - 3, 2*t + 1])
+    approx(F.integrate_along(P, (-2, 3), numeric=True), Rational(-175, 3))
+check("integrate_along: numeric matches exact", t_line_numeric_agrees)
+
+# ---- flux integrals of vector fields ----
+def t_flux_sphere_outward():
+    # F = (x,y,z), unit sphere, outward → 4π (divergence theorem: 3 · 4π/3)
+    F = Function("F", [x, y, z], [x, y, z])
+    S = Function("S", [u, v], [sin(u)*cos(v), sin(u)*sin(v), cos(u)])
+    approx(F.integrate_over(S, (0, pi), (0, 2*pi)), 4*pi)
+check("integrate_over: radial field, unit sphere", t_flux_sphere_outward)
+
+def t_flux_orientation_reversal():
+    # reversing one parameter negates the flux
+    F = Function("F", [x, y, z], [x, y, z])
+    S = Function("S", [u, v], [sin(u)*cos(v), sin(u)*sin(v), cos(u)])
+    I_fwd = F.integrate_over(S, (0, pi), (0, 2*pi))
+    I_rev = F.integrate_over(S, (pi, 0), (0, 2*pi))
+    approx(I_fwd + I_rev, 0)
+check("integrate_over: orientation reversal", t_flux_orientation_reversal)
+
+def t_flux_gauss_cylinder():
+    # F = (x, y, 0), lateral surface of cylinder R=1, h∈[0,3] → 6π
+    F = Function("F", [x, y, z], [x, y, 0])
+    S = Function("S", [u, v], [cos(u), sin(u), v])
+    approx(F.integrate_over(S, (0, 2*pi), (0, 3)), 6*pi)
+check("integrate_over: cylinder lateral flux", t_flux_gauss_cylinder)
+
+def t_flux_preconditions():
+    F2 = Function("F2", [x, y], [-y, x])
+    S = Function("S", [u, v], [sin(u)*cos(v), sin(u)*sin(v), cos(u)])
+    try:
+        F2.integrate_over(S, (0, pi), (0, 2*pi))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError for F not R^3 -> R^3")
+
+    F3 = Function("F3", [x, y, z], [x, y, z])
+    S_bad = Function("Sb", [u, v], [u, v])
+    try:
+        F3.integrate_over(S_bad, (0, 1), (0, 1))
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError for S not R^2 -> R^3")
+check("integrate_over: preconditions rejected", t_flux_preconditions)
+
+def t_flux_numeric_agrees():
+    F = Function("F", [x, y, z], [x, y, z])
+    S = Function("S", [u, v], [sin(u)*cos(v), sin(u)*sin(v), cos(u)])
+    approx(F.integrate_over(S, (0, pi), (0, 2*pi), numeric=True), 4*pi)
+check("integrate_over: numeric matches exact", t_flux_numeric_agrees)
+
 # ---- display protocols ----
 def t_repr_latex():
     s = f_scalar_2._repr_latex_()

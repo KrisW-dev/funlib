@@ -73,7 +73,14 @@ class Line2D(Renderable):
 
 # ==== Vector2D ====
 class Vector2D(Renderable):
-    """Arrow from origin to tip (a free vector drawn at a point)."""
+    """
+    Arrow from origin to tip (a free vector drawn at a point).
+
+    Note: uses matplotlib's default pivot='tail' (arrow starts at `origin`),
+    which is correct for a single drawn vector. VectorField2D uses
+    pivot='mid' instead, because a field reads better with arrows
+    centered on their sample points.
+    """
 
     def __init__(self, origin, tip, **style):
         self.origin = origin
