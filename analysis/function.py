@@ -82,6 +82,10 @@ class Function:
         self._coord_matrix = cm
 
     @property
+    def name(self):
+        return self._name
+
+    @property
     def args(self):
         """The argument symbols of self."""
         return self._args
@@ -201,6 +205,33 @@ class Function:
             raise ValueError("grad() is only for scalar functions; use diff() otherwise")
         D = self.diff()
         return Function("\\nabla_" + self._name, self.args, D.coord_matrix.T.tolist())
+
+    def _integrate_1d_numeric(self, t_range):
+        """Numeric scalar integral over a parameter interval, via scipy.integrate.quad."""
+        from scipy.integrate import quad
+        t = self.args[0]
+        f = lambdify(t, self.coord_matrix[0, 0], "numpy")
+        result, _ = quad(lambda tv: float(f(tv)),float(t_range[0]), float(t_range[1]))
+        return result
+
+    def integrate_1d(self, t_range, numeric=False):
+        r"""
+        Integral of a scalar function of one variable over a parameter interval:
+
+            $\int_{t_0}^{t_1} f(t) \, dt$
+
+        Preconditions:
+        (i) self is a scalar function $f: \mathbb{R} \to \mathbb{R}$.
+
+        Common use: arc length of a curve, as $\int ||C'(t)|| \, dt$ with
+        $f = ||C'||$ (see `speed()`).
+        """
+        if self._kind() != "scalar" or self.dom() != 1:
+            raise ValueError("integrate_1d needs a scalar function R -> R")
+        if numeric:
+            return self._integrate_1d_numeric(t_range)
+        t = self.args[0]
+        return sp_integrate(self.coord_matrix[0, 0],(t, t_range[0], t_range[1]))
 
     def _integrate_numeric(self, Phi, s_range, t_range):
         import numpy as np
@@ -456,6 +487,47 @@ class Function:
             return float(f_det(r, s, t))
 
         result, _ = tplquad(integrand,r_range[0], r_range[1],lambda _: s_range[0], lambda _: s_range[1], lambda _, __: t_range[0], lambda _, __: t_range[1])
+        return result
+
+    def _flux_across_integrand(self, gamma):
+        """Returns (t, F_x·γ'_y − F_y·γ'_x), the integrand of ∮_C F·n ds."""
+        t = gamma.args[0]
+        subs = {fa: gc for fa, gc in zip(self.args, gamma.coord_matrix.col(0))}
+        gx = gamma.coord_matrix[0, 0]
+        gy = gamma.coord_matrix[1, 0]
+        Fx = self.coord_matrix[0, 0].subs(subs)
+        Fy = self.coord_matrix[1, 0].subs(subs)
+        return t, Fx * gy.diff(t) - Fy * gx.diff(t)
+
+    def flux_across(self, gamma, t_range, numeric=False):
+        r"""
+        Flux of a plane vector field across a curve (2D divergence form of Green):
+
+            $\oint_C F \cdot n \, ds = \int_{t_0}^{t_1} F(\gamma(t)) \cdot n \, |\gamma'(t)| \, dt$
+
+        where $n = (\gamma'_y, -\gamma'_x)/|\gamma'|$ is the outward normal for
+        counterclockwise traversal. The $|\gamma'|$ cancels, so the integrand is
+        $F_x \gamma'_y - F_y \gamma'_x$.
+
+        Orientation: reversing t_range reverses the sign.
+        """
+        if self._kind() != "vector" or self.dom() != 2 or self.cod() != (2, 1):
+            raise ValueError("flux_across needs a vector field F: R^2 -> R^2")
+        if gamma._kind() != "vector" or gamma.dom() != 1 or gamma.cod() != (2, 1):
+            raise ValueError("gamma must be a curve R -> R^2")
+
+        if numeric:
+            return self._flux_across_numeric(gamma, t_range)
+
+        t, integrand = self._flux_across_integrand(gamma)
+        return sp_integrate(expand(trigsimp(integrand)), (t, t_range[0], t_range[1]))
+
+    def _flux_across_numeric(self, gamma, t_range):
+        from scipy.integrate import quad
+        t, integrand_expr = self._flux_across_integrand(gamma)
+        f = lambdify(t, integrand_expr, "numpy")
+        result, _ = quad(lambda tv: float(f(tv)),
+                        float(t_range[0]), float(t_range[1]))
         return result
 
     # ==== Plotting ====

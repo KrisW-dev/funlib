@@ -11,7 +11,7 @@ script exits nonzero. No pytest dependency, no notebook needed.
 
 import sys
 import numpy as np
-from sympy import symbols, cos, sin, pi, Rational
+from sympy import symbols, cos, sin, pi, Rational, sqrt
 
 from analysis import Function
 
@@ -226,6 +226,36 @@ def t_integrate_ellipse():
     approx(I, 6*pi)
 check("integrate: ellipse (a=2,b=3)", t_integrate_ellipse)
 
+def t_integrate_1d_poly():
+    # ∫₀¹ t² dt = 1/3
+    f = Function("f", [t], [t**2])
+    approx(f.integrate_1d((0, 1)), Rational(1, 3))
+check("integrate_1d: polynomial", t_integrate_1d_poly)
+
+def t_integrate_1d_circle_length():
+    # unit circle: |C'| = 1, length = 2π
+    circle = Function("c", [t], [cos(t), sin(t)])
+    speed = Function("|c'|", [t], [sqrt(sum(c.diff(t)**2 for c in circle.coord_matrix.col(0)))])
+    approx(speed.integrate_1d((0, 2*pi)), 2*pi)
+check("integrate_1d: unit circle length = 2π", t_integrate_1d_circle_length)
+
+def t_integrate_1d_numeric():
+    # same circle length, numeric path
+    circle = Function("c", [t], [cos(t), sin(t)])
+    speed = Function("|c'|", [t], [sqrt(sum(c.diff(t)**2 for c in circle.coord_matrix.col(0)))])
+    approx(speed.integrate_1d((0, 2*pi), numeric=True), 2*pi)
+check("integrate_1d: numeric matches exact", t_integrate_1d_numeric)
+
+def t_integrate_1d_precondition():
+    # a vector-valued function is not a scalar R -> R
+    vec = Function("v", [t], [cos(t), sin(t)])
+    try:
+        vec.integrate_1d((0, 1))
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError for non-scalar function")
+check("integrate_1d: rejects non-scalar", t_integrate_1d_precondition)
+
 # ---- surface area ----
 def t_area_sphere():
     S = Function("S", [u, v], [[2*sin(u)*cos(v)], [2*sin(u)*sin(v)], [2*cos(u)]])
@@ -383,7 +413,47 @@ def t_flux_numeric_agrees():
     F = Function("F", [x, y, z], [x, y, z])
     S = Function("S", [u, v], [sin(u)*cos(v), sin(u)*sin(v), cos(u)])
     approx(F.integrate_over(S, (0, pi), (0, 2*pi), numeric=True), 4*pi)
-check("integrate_over: numeric matches exact", t_flux_numeric_agrees)
+check("integrate_over: numeric matches exact", t_flux_numeric_agrees)\
+
+def t_flux_across_circle():
+    # F = (x/2, y/2), unit circle → π (unit disc area)
+    F = Function("F", [x, y], [x/2, y/2])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    approx(F.flux_across(gamma, (0, 2*pi)), pi)
+check("flux_across: radial field, unit circle", t_flux_across_circle)
+
+def t_flux_across_orientation():
+    F = Function("F", [x, y], [x/2, y/2])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    I_fwd = F.flux_across(gamma, (0, 2*pi))
+    I_rev = F.flux_across(gamma, (2*pi, 0))
+    approx(I_fwd + I_rev, 0)
+check("flux_across: orientation reversal", t_flux_across_orientation)
+
+def t_flux_across_preconditions():
+    F2 = Function("F2", [x, y, z], [x, y, z])     # R^3 → R^3, wrong
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    try:
+        F2.flux_across(gamma, (0, 2*pi))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected ValueError for F not R^2 -> R^2")
+
+    F = Function("F", [x, y], [x/2, y/2])
+    gamma_bad = Function("gb", [t], [cos(t), sin(t), t])
+    try:
+        F.flux_across(gamma_bad, (0, 2*pi))
+    except ValueError:
+        return
+    raise AssertionError("expected ValueError for gamma not R -> R^2")
+check("flux_across: preconditions rejected", t_flux_across_preconditions)
+
+def t_flux_across_numeric():
+    F = Function("F", [x, y], [x/2, y/2])
+    gamma = Function("gamma", [t], [cos(t), sin(t)])
+    approx(F.flux_across(gamma, (0, 2*pi), numeric=True), pi)
+check("flux_across: numeric matches exact", t_flux_across_numeric)
 
 # ---- display protocols ----
 def t_repr_latex():
