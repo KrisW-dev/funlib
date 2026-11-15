@@ -9,6 +9,10 @@ dist/
 .pytest_cache/
 .ruff_cache/
 
+# Kate
+
+*.kate-swp
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -22,6 +26,11 @@ notebooks
 
 # macOS
 .DS_Store
+
+# other stuff
+
+*.sh
+*.zip
 
 # Environments
 .env

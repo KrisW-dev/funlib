@@ -26,17 +26,18 @@ class Surface(Renderable):
     """
     Graph of a scalar function of two variables:  z = f(x, y).
 
-    Parameters
-    ----------
-    f : Function-like
-        Must satisfy _kind() == "scalar" and dom() == 2.
-    x_range, y_range : (float, float)
-    n : int
-        Grid resolution.
-    cmap : str or Colormap, optional
     """
 
     def __init__(self, f, x_range=(-10, 10), y_range=(-10, 10),n=100, cmap=None, color=None, alpha=None):
+        """
+        - f : Function 
+
+        - x_range, y_range : (float, float)
+
+        - n : int - grid resolution
+
+        - cmap : str or Colormap - optional
+        """
         _check_function(f)
         if f._kind() != "scalar" or f.dom() != 2:
             raise ValueError("Surface needs a function R^2 -> R (scalar, dom 2)")
@@ -79,16 +80,14 @@ class Surface(Renderable):
 class ParametricCurve3D(Renderable):
     """
     Parametric space curve:  (x(t), y(t), z(t)).
-
-    Parameters
-    ----------
-    f : Function-like
-        Must satisfy _kind() == "vector", dom() == 1, cod() == (3, 1).
-    t_range : (float, float)
-    n : int
     """
 
     def __init__(self, f, t_range=(0, 2 * np.pi), n=500, color=None):
+        """
+        f : Function
+        t_range : (float, float)
+        n : int - number of sample points
+        """
         _check_function(f)
         if f._kind() != "vector" or f.dom() != 1 or f.cod() != (3, 1):
             raise ValueError("ParametricCurve3D needs a function R -> R^3 (3 x 1)")
@@ -112,18 +111,15 @@ class ParametricCurve3D(Renderable):
 class ParametricSurface3D(Renderable):
     """
     Parametric surface:  (x(u, v), y(u, v), z(u, v)).
-
-    Parameters
-    ----------
-    f : Function-like
-        Must satisfy _kind() == "vector", dom() == 2, cod() == (3, 1).
-    u_range, v_range : (float, float)
-    n : int
-        Grid resolution.
-    cmap : str or Colormap, optional
     """
 
     def __init__(self, f, u_range=(-10, 10), v_range=(-10, 10), n=100, cmap=None, color=None, alpha=None):
+        """
+        f : Function
+        u_range, v_range : (float, float)
+        n : int - grid resolution
+        cmap : str or Colormap - optional
+        """
         _check_function(f)
         if f._kind() != "vector" or f.dom() != 2 or f.cod() != (3, 1):
             raise ValueError("ParametricSurface3D needs a function R^2 -> R^3 (3 x 1)")

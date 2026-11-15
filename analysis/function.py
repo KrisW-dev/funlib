@@ -238,23 +238,6 @@ class Function:
         integral if SymPy cannot do it). **Warning**: performance can be a bottleneck, even if SymPy is capable
         of providing an exact value. If `numeric = True`, the method returns a float.
         """
-        # if self._kind() != "scalar" or self.dom() != 2:
-        #     raise ValueError("integrate() needs a scalar function R^2 -> R")
-        # if Phi.dom() != 2 or Phi.cod() != (2, 1):
-        #     raise ValueError("parametrization Phi must be R^2 -> R^2 (2 x 1)")
-
-        # s, t = Phi._args
-        # xs = Phi.coord_matrix[0, 0]
-        # ys = Phi.coord_matrix[1, 0]
-
-        # detJ = Phi.diff().coord_matrix.det()
-
-        # x_expr = self.coord_matrix[0, 0]
-        # integrand = x_expr.subs({self.args[0]: xs, self.args[1]: ys}) * detJ
-        # result = sp_integrate(integrand, (s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
-
-        # return result if precision is None else N(result, precision)
-
         if self._kind() != "scalar" or self.dom() != 2:
             raise ValueError("integrate() needs a scalar function R^2 -> R")
         if Phi.dom() != 2 or Phi.cod() != (2, 1):
@@ -372,9 +355,36 @@ class Function:
 
     # ==== Plotting ====
 
-    def plot(self, dim, **kwargs):
-        """dim is '2d' or '3d'. """
-        return dispatch(self, dim, **kwargs)
+    def plot(self, plot_classification, **kwargs):
+        """
+        Constructs the correct `Matplotlib` plot in memory if applicable, it is the responsability of the user to place it in a Canvas object for
+        display (cf. the `graphics` module).
+
+        The call is highly context-sensitive, since by far not any function that can abstractly be handled by the class `Function` is eligible
+        for visualisation. Notice that this is an intrinsic limitation of human spatial senses, due to the way we evolved as species. Furthermore, 
+        certain eligible functions can admit different visualtions, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as
+        a surface or as a set of level curves.
+
+        For these reasons, the method `plot` needs a classification provided by the argement `plot_classification`, which takes the strings '2d' or '3d'
+        as values. It is important
+        to keep in mind that this argument classifies the *plot* to be constructed and *not* the underlying abstract function. 
+        It is in theory a decision of the user, although there is only one type of function handled by this module for which both '2d' and '3d' make sense. 
+        Once this decision taken, it the responsability of the user to provide the correct range arguments. The following table make this precise
+
+        | type of function                            | plot classification   | range argument(s)                             | dispatched to          |
+        |---------------------------------------------|-----------------------| ----------------------------------------------|------------------------|
+        | $\\mathbb{R} \\rightarrow \\mathbb{R}$      | `2d`                  | `x_range = (min,max)`                         | `Curve2D`              |
+        | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$    | `2d`                  | `x_range = (min,max)`, `y_range = (min,max)`  | `Implicit2D`           |
+        | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$    | `3d`                  | `x_range = (min,max)`, `y_range = (min,max)`  | `Surface`              |
+        | $\\mathbb{R} \\rightarrow \\mathbb{R}^2$    | `2d`                  | `t_range= (min,max)`                          | `ParametricCurve2D`    |
+        | $\\mathbb{R} \\rightarrow \\mathbb{R}^3$    | `3d`                  | `t_range = (min,max)`                         | `ParametricCurve3D`    |
+        | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}^3$  | `3d`                  | `u_range = (min,max)`, `v_range = (min,max)`  | `Parametricsurface3D`  |        
+
+        The column with the dispatches is purely informative (a dispatch is part of the software architecture, not a user-level action).
+        The range arguments are passed as `**kwargs` as their names and their number vary. Notice that other arguments (for instance 
+        those specifying a color or a color map) can be passed as `**kwargs` as well.  
+        """
+        return dispatch(self, plot_classification, **kwargs)
 
     # ==== Display ====
     
@@ -420,7 +430,10 @@ class Function:
                 f"\\\\ & {largs} & \\mapsto & {lexpr} {closingstr}")
 
     def display(self):
-        """Explicitly renders the LaTeX form (for non-last-line use)."""
+        """
+        LaTeX display of a Function object in a Jupyter notebook. The method is automatically invoked if (the `Python` variable containing) the 
+        object is the last line of a code cell, otherwise it needs to be invoked it explicitely. 
+        """
         s = self._repr_latex_()
         if _HAVE_IPYTHON:
             _display(Latex(s))

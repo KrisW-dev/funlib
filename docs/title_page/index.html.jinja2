@@ -1,0 +1,31 @@
+{% extends "default/index.html.jinja2" %}
+
+{% block title %}Hello World{% endblock %}
+
+{% block nav %}
+    <img src="https://pdoc.dev/logo.svg" class="logo" alt="project logo"/>
+    <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
+                   pattern=".+" required>
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+    <main class="pdoc">
+
+    {% filter to_html %}
+<center>
+
+<h1> Funlib </h1>
+<h5>  A lightweight teching tool for multivariate analysis </h5>
+Author: K.Worytkiewicz
+</center>
+
+You can perform symbolic and numeric computation as well as
+display plots. The tool is intended to be used in `Jupyter` notebooks in a way reminscent of `Sagemath`.
+It is written in `Python` and based on `SymPy` for the symbolic computation, on `NumPy` for the numeric computation and
+on `Matplotlib` for the plotting. The latter is a conservative choice: there are nowadays significantly better plotting libraries out there e.g. `Plotly` or `PyQtGraph`, yet they typically require some installation effort.
+    {% endfilter %}
+
+    </main>
+    {% include "search.html.jinja2" %}
+{% endblock %}

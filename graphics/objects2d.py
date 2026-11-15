@@ -90,25 +90,6 @@ class Vector2D(Renderable):
         tx, ty = self.tip
         return ax.quiver(ox, oy, tx - ox, ty - oy, **merged)
 
-
-# ==== Circle2D ====
-# class Circle2D(Renderable):
-#     """Circle of given radius centered at (cx, cy)."""
-
-#     def __init__(self, center, radius, **style):
-#         self.center = center
-#         self.radius = radius
-#         style.setdefault("fill", False)
-#         style.setdefault("color", "black")
-#         self.style = style
-
-#     def render(self, ax, **kw):
-#         merged = {**self.style, **kw}
-#         cx, cy = self.center
-#         circle = Circle((cx, cy), self.radius, **merged)
-#         ax.add_patch(circle)
-#         return circle
-
 # ==== Polygon2D ====
 class Polygon2D(Renderable):
     """Closed polygon through the given vertices (list of (x, y))."""

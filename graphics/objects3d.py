@@ -98,20 +98,22 @@ class Plane(Renderable):
     Two spanning vectors u, v are computed from `normal` internally;
     the drawn patch is the set  p + s*u + t*v  for s, t in
     [-size/2, size/2].
-
-    Parameters
-    ----------
-    p : (x, y, z)
-    normal : (nx, ny, nz)
-        Does not need to be normalized.
-    size : float
-    n : int
-        Mesh resolution (2 is enough for a flat patch).
-    cmap : str or Colormap, optional
-    color : optional
     """
 
     def __init__(self, p, normal, size=1.0, n=2, cmap=None, color=None, alpha=None, **style):
+        """
+        - p : (x, y, z) 
+
+        - normal : (nx, ny, nz) - the normal vector
+
+        - size : float - size of the patch
+
+        - n : int - mesh resolution (2 is enough for a flat patch)
+
+        - cmap : str or Colormap - optional
+
+        - color : optional
+        """
         self.p = p
         self.normal = normal
         self.size = size
