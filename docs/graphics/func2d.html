@@ -121,6 +121,30 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#VectorField2D">VectorField2D</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#VectorField2D.__init__">VectorField2D</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#VectorField2D.f">f</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#VectorField2D.scale">scale</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#VectorField2D.color">color</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#VectorField2D.style">style</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#VectorField2D.render">render</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -310,6 +334,109 @@ free of an import cycle.</p>
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="k">return</span> <span class="n">cs</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="c1"># ==== VectorField2D ====</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="k">class</span><span class="w"> </span><span class="nc">VectorField2D</span><span class="p">(</span><span class="n">Renderable</span><span class="p">):</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">    Vector field  F : R^2 -&gt; R^2  drawn as arrows.</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    Sampling locations (exactly one of the following; default = grid):</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">      - grid (default):  n uniformly spaced points over x_range x y_range</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">      - points:          an explicit list of (x, y) pairs</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">      - along:           a ParametricCurve2D, or a Function R -&gt; R^2</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">    Each arrow is F(p) drawn at p; arrow length is F's own magnitude</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">    (so a field with small arrows at some points and large at others</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    reads correctly). Use `scale` to shrink/enlarge all arrows uniformly.</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">    """</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>            <span class="n">f</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>            <span class="n">grid_density</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>            <span class="n">points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>            <span class="n">along</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>            <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">style</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>        <span class="p">):</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="w">        </span><span class="sd">"""</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">        - f : Function R^2 -&gt; R^2</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">        - x_range, y_range : (float, float)  bounds of the sampling window</span>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a><span class="sd">        - n : int or (int, int)  grid density; ignored if points/along given</span>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a><span class="sd">        - points : list of (x, y)  sample locations; mutually exclusive with along</span>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>
+</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a><span class="sd">        - along : Function R -&gt; R^2  sample on the curve</span>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="sd">        - scale : float or None  forwarded to ax.quiver's scale; None = auto</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a><span class="sd">        - **style : forwarded to ax.quiver (width, headwidth, pivot, ...)</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="sd">        """</span>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>        <span class="n">_check_function</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">_kind</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">"vector"</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">cod</span><span class="p">()</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"VectorField2D needs a function R^2 -&gt; R^2 (2 x 1)"</span><span class="p">)</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>        <span class="n">given</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>                 <span class="p">((</span><span class="s2">"points"</span><span class="p">,</span> <span class="n">points</span><span class="p">),</span> <span class="p">(</span><span class="s2">"along"</span><span class="p">,</span> <span class="n">along</span><span class="p">))</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">given</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"only one of points/along may be given; got </span><span class="si">{</span><span class="n">given</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>        <span class="k">if</span> <span class="n">given</span> <span class="ow">and</span> <span class="n">grid_density</span> <span class="o">!=</span> <span class="mi">20</span><span class="p">:</span>  <span class="c1"># user explicitly overrode n but also gave points/along</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>            <span class="c1"># not worth raising — just document that n is ignored</span>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>            <span class="k">pass</span>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"angles"</span><span class="p">,</span> <span class="s2">"xy"</span><span class="p">)</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"scale_units"</span><span class="p">,</span> <span class="s2">"xy"</span><span class="p">)</span>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>        <span class="c1">#style.setdefault("pivot", "mid")</span>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"zorder"</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>            <span class="n">style</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">style</span>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>        <span class="c1"># ---- determine sample locations ----</span>
+</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>        <span class="k">if</span> <span class="n">along</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>            <span class="k">if</span> <span class="n">t_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>                    <span class="s2">"along= requires t_range=(t0, t1); a curve γ: R → R^2 "</span>
+</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>                    <span class="s2">"does not know its own parameter interval"</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>                <span class="p">)</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>            <span class="k">if</span> <span class="n">n_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">)</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>        <span class="k">elif</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>            <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>            <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>            <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid_density</span><span class="p">,</span> <span class="n">grid_density</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">grid_density</span><span class="p">)</span> <span class="k">else</span> <span class="n">grid_density</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>            <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">_linspace</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">_linspace</span><span class="p">(</span><span class="n">y_range</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>        <span class="c1"># ---- evaluate F at those points ----</span>
+</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">_numeric</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">,</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="w">        </span><span class="sd">"""Sample a curve γ: R → R^2 at n parameter values in [0, n_samples]."""</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>        <span class="n">_check_function</span><span class="p">(</span><span class="n">along</span><span class="p">)</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>        <span class="k">if</span> <span class="n">along</span><span class="o">.</span><span class="n">_kind</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">"vector"</span> <span class="ow">or</span> <span class="n">along</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">along</span><span class="o">.</span><span class="n">cod</span><span class="p">()</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>                <span class="s2">"along= must be a Function R -&gt; R^2 (a parametric curve); "</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>                <span class="s2">"to overlay its plot, add the curve separately"</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>            <span class="p">)</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">n_samples</span><span class="p">)</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">_numeric</span><span class="p">(</span><span class="n">along</span><span class="p">)(</span><span class="n">t</span><span class="p">)</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>        <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">}</span>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>            <span class="n">merged</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"color"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="o">**</span><span class="n">merged</span><span class="p">)</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </span></pre></div>
 
 
@@ -793,6 +920,300 @@ free of an import cycle.</p>
 </span><span id="Implicit2D.render-153"><a href="#Implicit2D.render-153"><span class="linenos">153</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </span><span id="Implicit2D.render-154"><a href="#Implicit2D.render-154"><span class="linenos">154</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </span><span id="Implicit2D.render-155"><a href="#Implicit2D.render-155"><span class="linenos">155</span></a>        <span class="k">return</span> <span class="n">cs</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                </section>
+                <section id="VectorField2D">
+                            <input id="VectorField2D-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">VectorField2D</span><wbr>(<span class="base"><a href="canvas.html#Renderable">graphics.canvas.Renderable</a></span>):
+
+                <label class="view-source-button" for="VectorField2D-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#VectorField2D"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="VectorField2D-157"><a href="#VectorField2D-157"><span class="linenos">157</span></a><span class="k">class</span><span class="w"> </span><span class="nc">VectorField2D</span><span class="p">(</span><span class="n">Renderable</span><span class="p">):</span>
+</span><span id="VectorField2D-158"><a href="#VectorField2D-158"><span class="linenos">158</span></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="VectorField2D-159"><a href="#VectorField2D-159"><span class="linenos">159</span></a><span class="sd">    Vector field  F : R^2 -&gt; R^2  drawn as arrows.</span>
+</span><span id="VectorField2D-160"><a href="#VectorField2D-160"><span class="linenos">160</span></a>
+</span><span id="VectorField2D-161"><a href="#VectorField2D-161"><span class="linenos">161</span></a><span class="sd">    Sampling locations (exactly one of the following; default = grid):</span>
+</span><span id="VectorField2D-162"><a href="#VectorField2D-162"><span class="linenos">162</span></a><span class="sd">      - grid (default):  n uniformly spaced points over x_range x y_range</span>
+</span><span id="VectorField2D-163"><a href="#VectorField2D-163"><span class="linenos">163</span></a><span class="sd">      - points:          an explicit list of (x, y) pairs</span>
+</span><span id="VectorField2D-164"><a href="#VectorField2D-164"><span class="linenos">164</span></a><span class="sd">      - along:           a ParametricCurve2D, or a Function R -&gt; R^2</span>
+</span><span id="VectorField2D-165"><a href="#VectorField2D-165"><span class="linenos">165</span></a>
+</span><span id="VectorField2D-166"><a href="#VectorField2D-166"><span class="linenos">166</span></a><span class="sd">    Each arrow is F(p) drawn at p; arrow length is F's own magnitude</span>
+</span><span id="VectorField2D-167"><a href="#VectorField2D-167"><span class="linenos">167</span></a><span class="sd">    (so a field with small arrows at some points and large at others</span>
+</span><span id="VectorField2D-168"><a href="#VectorField2D-168"><span class="linenos">168</span></a><span class="sd">    reads correctly). Use `scale` to shrink/enlarge all arrows uniformly.</span>
+</span><span id="VectorField2D-169"><a href="#VectorField2D-169"><span class="linenos">169</span></a><span class="sd">    """</span>
+</span><span id="VectorField2D-170"><a href="#VectorField2D-170"><span class="linenos">170</span></a>
+</span><span id="VectorField2D-171"><a href="#VectorField2D-171"><span class="linenos">171</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+</span><span id="VectorField2D-172"><a href="#VectorField2D-172"><span class="linenos">172</span></a>            <span class="n">f</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+</span><span id="VectorField2D-173"><a href="#VectorField2D-173"><span class="linenos">173</span></a>            <span class="n">grid_density</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+</span><span id="VectorField2D-174"><a href="#VectorField2D-174"><span class="linenos">174</span></a>            <span class="n">points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+</span><span id="VectorField2D-175"><a href="#VectorField2D-175"><span class="linenos">175</span></a>            <span class="n">along</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="VectorField2D-176"><a href="#VectorField2D-176"><span class="linenos">176</span></a>            <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">style</span>
+</span><span id="VectorField2D-177"><a href="#VectorField2D-177"><span class="linenos">177</span></a>        <span class="p">):</span>
+</span><span id="VectorField2D-178"><a href="#VectorField2D-178"><span class="linenos">178</span></a><span class="w">        </span><span class="sd">"""</span>
+</span><span id="VectorField2D-179"><a href="#VectorField2D-179"><span class="linenos">179</span></a><span class="sd">        - f : Function R^2 -&gt; R^2</span>
+</span><span id="VectorField2D-180"><a href="#VectorField2D-180"><span class="linenos">180</span></a>
+</span><span id="VectorField2D-181"><a href="#VectorField2D-181"><span class="linenos">181</span></a><span class="sd">        - x_range, y_range : (float, float)  bounds of the sampling window</span>
+</span><span id="VectorField2D-182"><a href="#VectorField2D-182"><span class="linenos">182</span></a>
+</span><span id="VectorField2D-183"><a href="#VectorField2D-183"><span class="linenos">183</span></a><span class="sd">        - n : int or (int, int)  grid density; ignored if points/along given</span>
+</span><span id="VectorField2D-184"><a href="#VectorField2D-184"><span class="linenos">184</span></a>
+</span><span id="VectorField2D-185"><a href="#VectorField2D-185"><span class="linenos">185</span></a><span class="sd">        - points : list of (x, y)  sample locations; mutually exclusive with along</span>
+</span><span id="VectorField2D-186"><a href="#VectorField2D-186"><span class="linenos">186</span></a>
+</span><span id="VectorField2D-187"><a href="#VectorField2D-187"><span class="linenos">187</span></a><span class="sd">        - along : Function R -&gt; R^2  sample on the curve</span>
+</span><span id="VectorField2D-188"><a href="#VectorField2D-188"><span class="linenos">188</span></a>
+</span><span id="VectorField2D-189"><a href="#VectorField2D-189"><span class="linenos">189</span></a><span class="sd">        - scale : float or None  forwarded to ax.quiver's scale; None = auto</span>
+</span><span id="VectorField2D-190"><a href="#VectorField2D-190"><span class="linenos">190</span></a>
+</span><span id="VectorField2D-191"><a href="#VectorField2D-191"><span class="linenos">191</span></a><span class="sd">        - **style : forwarded to ax.quiver (width, headwidth, pivot, ...)</span>
+</span><span id="VectorField2D-192"><a href="#VectorField2D-192"><span class="linenos">192</span></a><span class="sd">        """</span>
+</span><span id="VectorField2D-193"><a href="#VectorField2D-193"><span class="linenos">193</span></a>        <span class="n">_check_function</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="VectorField2D-194"><a href="#VectorField2D-194"><span class="linenos">194</span></a>        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">_kind</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">"vector"</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">cod</span><span class="p">()</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="VectorField2D-195"><a href="#VectorField2D-195"><span class="linenos">195</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"VectorField2D needs a function R^2 -&gt; R^2 (2 x 1)"</span><span class="p">)</span>
+</span><span id="VectorField2D-196"><a href="#VectorField2D-196"><span class="linenos">196</span></a>
+</span><span id="VectorField2D-197"><a href="#VectorField2D-197"><span class="linenos">197</span></a>        <span class="n">given</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
+</span><span id="VectorField2D-198"><a href="#VectorField2D-198"><span class="linenos">198</span></a>                 <span class="p">((</span><span class="s2">"points"</span><span class="p">,</span> <span class="n">points</span><span class="p">),</span> <span class="p">(</span><span class="s2">"along"</span><span class="p">,</span> <span class="n">along</span><span class="p">))</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="VectorField2D-199"><a href="#VectorField2D-199"><span class="linenos">199</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">given</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="VectorField2D-200"><a href="#VectorField2D-200"><span class="linenos">200</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"only one of points/along may be given; got </span><span class="si">{</span><span class="n">given</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="VectorField2D-201"><a href="#VectorField2D-201"><span class="linenos">201</span></a>        <span class="k">if</span> <span class="n">given</span> <span class="ow">and</span> <span class="n">grid_density</span> <span class="o">!=</span> <span class="mi">20</span><span class="p">:</span>  <span class="c1"># user explicitly overrode n but also gave points/along</span>
+</span><span id="VectorField2D-202"><a href="#VectorField2D-202"><span class="linenos">202</span></a>            <span class="c1"># not worth raising — just document that n is ignored</span>
+</span><span id="VectorField2D-203"><a href="#VectorField2D-203"><span class="linenos">203</span></a>            <span class="k">pass</span>
+</span><span id="VectorField2D-204"><a href="#VectorField2D-204"><span class="linenos">204</span></a>
+</span><span id="VectorField2D-205"><a href="#VectorField2D-205"><span class="linenos">205</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+</span><span id="VectorField2D-206"><a href="#VectorField2D-206"><span class="linenos">206</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span>
+</span><span id="VectorField2D-207"><a href="#VectorField2D-207"><span class="linenos">207</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+</span><span id="VectorField2D-208"><a href="#VectorField2D-208"><span class="linenos">208</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"angles"</span><span class="p">,</span> <span class="s2">"xy"</span><span class="p">)</span>
+</span><span id="VectorField2D-209"><a href="#VectorField2D-209"><span class="linenos">209</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"scale_units"</span><span class="p">,</span> <span class="s2">"xy"</span><span class="p">)</span>
+</span><span id="VectorField2D-210"><a href="#VectorField2D-210"><span class="linenos">210</span></a>        <span class="c1">#style.setdefault("pivot", "mid")</span>
+</span><span id="VectorField2D-211"><a href="#VectorField2D-211"><span class="linenos">211</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"zorder"</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="VectorField2D-212"><a href="#VectorField2D-212"><span class="linenos">212</span></a>        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D-213"><a href="#VectorField2D-213"><span class="linenos">213</span></a>            <span class="n">style</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span>
+</span><span id="VectorField2D-214"><a href="#VectorField2D-214"><span class="linenos">214</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">style</span>
+</span><span id="VectorField2D-215"><a href="#VectorField2D-215"><span class="linenos">215</span></a>
+</span><span id="VectorField2D-216"><a href="#VectorField2D-216"><span class="linenos">216</span></a>        <span class="c1"># ---- determine sample locations ----</span>
+</span><span id="VectorField2D-217"><a href="#VectorField2D-217"><span class="linenos">217</span></a>        <span class="k">if</span> <span class="n">along</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D-218"><a href="#VectorField2D-218"><span class="linenos">218</span></a>            <span class="k">if</span> <span class="n">t_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D-219"><a href="#VectorField2D-219"><span class="linenos">219</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="VectorField2D-220"><a href="#VectorField2D-220"><span class="linenos">220</span></a>                    <span class="s2">"along= requires t_range=(t0, t1); a curve γ: R → R^2 "</span>
+</span><span id="VectorField2D-221"><a href="#VectorField2D-221"><span class="linenos">221</span></a>                    <span class="s2">"does not know its own parameter interval"</span>
+</span><span id="VectorField2D-222"><a href="#VectorField2D-222"><span class="linenos">222</span></a>                <span class="p">)</span>
+</span><span id="VectorField2D-223"><a href="#VectorField2D-223"><span class="linenos">223</span></a>            <span class="k">if</span> <span class="n">n_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D-224"><a href="#VectorField2D-224"><span class="linenos">224</span></a>                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+</span><span id="VectorField2D-225"><a href="#VectorField2D-225"><span class="linenos">225</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="VectorField2D-226"><a href="#VectorField2D-226"><span class="linenos">226</span></a>                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">)</span>
+</span><span id="VectorField2D-227"><a href="#VectorField2D-227"><span class="linenos">227</span></a>        <span class="k">elif</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D-228"><a href="#VectorField2D-228"><span class="linenos">228</span></a>            <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="VectorField2D-229"><a href="#VectorField2D-229"><span class="linenos">229</span></a>            <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="VectorField2D-230"><a href="#VectorField2D-230"><span class="linenos">230</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="VectorField2D-231"><a href="#VectorField2D-231"><span class="linenos">231</span></a>            <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid_density</span><span class="p">,</span> <span class="n">grid_density</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">grid_density</span><span class="p">)</span> <span class="k">else</span> <span class="n">grid_density</span>
+</span><span id="VectorField2D-232"><a href="#VectorField2D-232"><span class="linenos">232</span></a>            <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">_linspace</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">_linspace</span><span class="p">(</span><span class="n">y_range</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
+</span><span id="VectorField2D-233"><a href="#VectorField2D-233"><span class="linenos">233</span></a>
+</span><span id="VectorField2D-234"><a href="#VectorField2D-234"><span class="linenos">234</span></a>        <span class="c1"># ---- evaluate F at those points ----</span>
+</span><span id="VectorField2D-235"><a href="#VectorField2D-235"><span class="linenos">235</span></a>        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">_numeric</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</span><span id="VectorField2D-236"><a href="#VectorField2D-236"><span class="linenos">236</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span>
+</span><span id="VectorField2D-237"><a href="#VectorField2D-237"><span class="linenos">237</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</span><span id="VectorField2D-238"><a href="#VectorField2D-238"><span class="linenos">238</span></a>
+</span><span id="VectorField2D-239"><a href="#VectorField2D-239"><span class="linenos">239</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="VectorField2D-240"><a href="#VectorField2D-240"><span class="linenos">240</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">,</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+</span><span id="VectorField2D-241"><a href="#VectorField2D-241"><span class="linenos">241</span></a><span class="w">        </span><span class="sd">"""Sample a curve γ: R → R^2 at n parameter values in [0, n_samples]."""</span>
+</span><span id="VectorField2D-242"><a href="#VectorField2D-242"><span class="linenos">242</span></a>        <span class="n">_check_function</span><span class="p">(</span><span class="n">along</span><span class="p">)</span>
+</span><span id="VectorField2D-243"><a href="#VectorField2D-243"><span class="linenos">243</span></a>        <span class="k">if</span> <span class="n">along</span><span class="o">.</span><span class="n">_kind</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">"vector"</span> <span class="ow">or</span> <span class="n">along</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">along</span><span class="o">.</span><span class="n">cod</span><span class="p">()</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="VectorField2D-244"><a href="#VectorField2D-244"><span class="linenos">244</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="VectorField2D-245"><a href="#VectorField2D-245"><span class="linenos">245</span></a>                <span class="s2">"along= must be a Function R -&gt; R^2 (a parametric curve); "</span>
+</span><span id="VectorField2D-246"><a href="#VectorField2D-246"><span class="linenos">246</span></a>                <span class="s2">"to overlay its plot, add the curve separately"</span>
+</span><span id="VectorField2D-247"><a href="#VectorField2D-247"><span class="linenos">247</span></a>            <span class="p">)</span>
+</span><span id="VectorField2D-248"><a href="#VectorField2D-248"><span class="linenos">248</span></a>        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">n_samples</span><span class="p">)</span>
+</span><span id="VectorField2D-249"><a href="#VectorField2D-249"><span class="linenos">249</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">_numeric</span><span class="p">(</span><span class="n">along</span><span class="p">)(</span><span class="n">t</span><span class="p">)</span>
+</span><span id="VectorField2D-250"><a href="#VectorField2D-250"><span class="linenos">250</span></a>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</span><span id="VectorField2D-251"><a href="#VectorField2D-251"><span class="linenos">251</span></a>
+</span><span id="VectorField2D-252"><a href="#VectorField2D-252"><span class="linenos">252</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+</span><span id="VectorField2D-253"><a href="#VectorField2D-253"><span class="linenos">253</span></a>        <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">}</span>
+</span><span id="VectorField2D-254"><a href="#VectorField2D-254"><span class="linenos">254</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D-255"><a href="#VectorField2D-255"><span class="linenos">255</span></a>            <span class="n">merged</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"color"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+</span><span id="VectorField2D-256"><a href="#VectorField2D-256"><span class="linenos">256</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="o">**</span><span class="n">merged</span><span class="p">)</span>
+</span><span id="VectorField2D-257"><a href="#VectorField2D-257"><span class="linenos">257</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="VectorField2D-258"><a href="#VectorField2D-258"><span class="linenos">258</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Vector field  F : R^2 -> R^2  drawn as arrows.</p>
+
+<p>Sampling locations (exactly one of the following; default = grid):</p>
+
+<ul>
+<li>grid (default):  n uniformly spaced points over x_range x y_range</li>
+<li>points:          an explicit list of (x, y) pairs</li>
+<li>along:           a ParametricCurve2D, or a Function R -> R^2</li>
+</ul>
+
+<p>Each arrow is F(p) drawn at p; arrow length is F's own magnitude
+(so a field with small arrows at some points and large at others
+reads correctly). Use <code><a href="#VectorField2D.scale">scale</a></code> to shrink/enlarge all arrows uniformly.</p>
+</div>
+
+
+                            <div id="VectorField2D.__init__" class="classattr">
+                                        <input id="VectorField2D.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">VectorField2D</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">f</span>,</span><span class="param">	<span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>,</span><span class="param">	<span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>,</span><span class="param">	<span class="n">grid_density</span><span class="o">=</span><span class="mi">10</span>,</span><span class="param">	<span class="n">points</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">along</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">t_range</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">scale</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">color</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="o">**</span><span class="n">style</span></span>)</span>
+
+                <label class="view-source-button" for="VectorField2D.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#VectorField2D.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="VectorField2D.__init__-171"><a href="#VectorField2D.__init__-171"><span class="linenos">171</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+</span><span id="VectorField2D.__init__-172"><a href="#VectorField2D.__init__-172"><span class="linenos">172</span></a>            <span class="n">f</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+</span><span id="VectorField2D.__init__-173"><a href="#VectorField2D.__init__-173"><span class="linenos">173</span></a>            <span class="n">grid_density</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+</span><span id="VectorField2D.__init__-174"><a href="#VectorField2D.__init__-174"><span class="linenos">174</span></a>            <span class="n">points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+</span><span id="VectorField2D.__init__-175"><a href="#VectorField2D.__init__-175"><span class="linenos">175</span></a>            <span class="n">along</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="VectorField2D.__init__-176"><a href="#VectorField2D.__init__-176"><span class="linenos">176</span></a>            <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">style</span>
+</span><span id="VectorField2D.__init__-177"><a href="#VectorField2D.__init__-177"><span class="linenos">177</span></a>        <span class="p">):</span>
+</span><span id="VectorField2D.__init__-178"><a href="#VectorField2D.__init__-178"><span class="linenos">178</span></a><span class="w">        </span><span class="sd">"""</span>
+</span><span id="VectorField2D.__init__-179"><a href="#VectorField2D.__init__-179"><span class="linenos">179</span></a><span class="sd">        - f : Function R^2 -&gt; R^2</span>
+</span><span id="VectorField2D.__init__-180"><a href="#VectorField2D.__init__-180"><span class="linenos">180</span></a>
+</span><span id="VectorField2D.__init__-181"><a href="#VectorField2D.__init__-181"><span class="linenos">181</span></a><span class="sd">        - x_range, y_range : (float, float)  bounds of the sampling window</span>
+</span><span id="VectorField2D.__init__-182"><a href="#VectorField2D.__init__-182"><span class="linenos">182</span></a>
+</span><span id="VectorField2D.__init__-183"><a href="#VectorField2D.__init__-183"><span class="linenos">183</span></a><span class="sd">        - n : int or (int, int)  grid density; ignored if points/along given</span>
+</span><span id="VectorField2D.__init__-184"><a href="#VectorField2D.__init__-184"><span class="linenos">184</span></a>
+</span><span id="VectorField2D.__init__-185"><a href="#VectorField2D.__init__-185"><span class="linenos">185</span></a><span class="sd">        - points : list of (x, y)  sample locations; mutually exclusive with along</span>
+</span><span id="VectorField2D.__init__-186"><a href="#VectorField2D.__init__-186"><span class="linenos">186</span></a>
+</span><span id="VectorField2D.__init__-187"><a href="#VectorField2D.__init__-187"><span class="linenos">187</span></a><span class="sd">        - along : Function R -&gt; R^2  sample on the curve</span>
+</span><span id="VectorField2D.__init__-188"><a href="#VectorField2D.__init__-188"><span class="linenos">188</span></a>
+</span><span id="VectorField2D.__init__-189"><a href="#VectorField2D.__init__-189"><span class="linenos">189</span></a><span class="sd">        - scale : float or None  forwarded to ax.quiver's scale; None = auto</span>
+</span><span id="VectorField2D.__init__-190"><a href="#VectorField2D.__init__-190"><span class="linenos">190</span></a>
+</span><span id="VectorField2D.__init__-191"><a href="#VectorField2D.__init__-191"><span class="linenos">191</span></a><span class="sd">        - **style : forwarded to ax.quiver (width, headwidth, pivot, ...)</span>
+</span><span id="VectorField2D.__init__-192"><a href="#VectorField2D.__init__-192"><span class="linenos">192</span></a><span class="sd">        """</span>
+</span><span id="VectorField2D.__init__-193"><a href="#VectorField2D.__init__-193"><span class="linenos">193</span></a>        <span class="n">_check_function</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-194"><a href="#VectorField2D.__init__-194"><span class="linenos">194</span></a>        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">_kind</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">"vector"</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">cod</span><span class="p">()</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="VectorField2D.__init__-195"><a href="#VectorField2D.__init__-195"><span class="linenos">195</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"VectorField2D needs a function R^2 -&gt; R^2 (2 x 1)"</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-196"><a href="#VectorField2D.__init__-196"><span class="linenos">196</span></a>
+</span><span id="VectorField2D.__init__-197"><a href="#VectorField2D.__init__-197"><span class="linenos">197</span></a>        <span class="n">given</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
+</span><span id="VectorField2D.__init__-198"><a href="#VectorField2D.__init__-198"><span class="linenos">198</span></a>                 <span class="p">((</span><span class="s2">"points"</span><span class="p">,</span> <span class="n">points</span><span class="p">),</span> <span class="p">(</span><span class="s2">"along"</span><span class="p">,</span> <span class="n">along</span><span class="p">))</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="VectorField2D.__init__-199"><a href="#VectorField2D.__init__-199"><span class="linenos">199</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">given</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-200"><a href="#VectorField2D.__init__-200"><span class="linenos">200</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"only one of points/along may be given; got </span><span class="si">{</span><span class="n">given</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-201"><a href="#VectorField2D.__init__-201"><span class="linenos">201</span></a>        <span class="k">if</span> <span class="n">given</span> <span class="ow">and</span> <span class="n">grid_density</span> <span class="o">!=</span> <span class="mi">20</span><span class="p">:</span>  <span class="c1"># user explicitly overrode n but also gave points/along</span>
+</span><span id="VectorField2D.__init__-202"><a href="#VectorField2D.__init__-202"><span class="linenos">202</span></a>            <span class="c1"># not worth raising — just document that n is ignored</span>
+</span><span id="VectorField2D.__init__-203"><a href="#VectorField2D.__init__-203"><span class="linenos">203</span></a>            <span class="k">pass</span>
+</span><span id="VectorField2D.__init__-204"><a href="#VectorField2D.__init__-204"><span class="linenos">204</span></a>
+</span><span id="VectorField2D.__init__-205"><a href="#VectorField2D.__init__-205"><span class="linenos">205</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+</span><span id="VectorField2D.__init__-206"><a href="#VectorField2D.__init__-206"><span class="linenos">206</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span>
+</span><span id="VectorField2D.__init__-207"><a href="#VectorField2D.__init__-207"><span class="linenos">207</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+</span><span id="VectorField2D.__init__-208"><a href="#VectorField2D.__init__-208"><span class="linenos">208</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"angles"</span><span class="p">,</span> <span class="s2">"xy"</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-209"><a href="#VectorField2D.__init__-209"><span class="linenos">209</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"scale_units"</span><span class="p">,</span> <span class="s2">"xy"</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-210"><a href="#VectorField2D.__init__-210"><span class="linenos">210</span></a>        <span class="c1">#style.setdefault("pivot", "mid")</span>
+</span><span id="VectorField2D.__init__-211"><a href="#VectorField2D.__init__-211"><span class="linenos">211</span></a>        <span class="n">style</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"zorder"</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-212"><a href="#VectorField2D.__init__-212"><span class="linenos">212</span></a>        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-213"><a href="#VectorField2D.__init__-213"><span class="linenos">213</span></a>            <span class="n">style</span><span class="p">[</span><span class="s2">"scale"</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span>
+</span><span id="VectorField2D.__init__-214"><a href="#VectorField2D.__init__-214"><span class="linenos">214</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">style</span>
+</span><span id="VectorField2D.__init__-215"><a href="#VectorField2D.__init__-215"><span class="linenos">215</span></a>
+</span><span id="VectorField2D.__init__-216"><a href="#VectorField2D.__init__-216"><span class="linenos">216</span></a>        <span class="c1"># ---- determine sample locations ----</span>
+</span><span id="VectorField2D.__init__-217"><a href="#VectorField2D.__init__-217"><span class="linenos">217</span></a>        <span class="k">if</span> <span class="n">along</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-218"><a href="#VectorField2D.__init__-218"><span class="linenos">218</span></a>            <span class="k">if</span> <span class="n">t_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-219"><a href="#VectorField2D.__init__-219"><span class="linenos">219</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="VectorField2D.__init__-220"><a href="#VectorField2D.__init__-220"><span class="linenos">220</span></a>                    <span class="s2">"along= requires t_range=(t0, t1); a curve γ: R → R^2 "</span>
+</span><span id="VectorField2D.__init__-221"><a href="#VectorField2D.__init__-221"><span class="linenos">221</span></a>                    <span class="s2">"does not know its own parameter interval"</span>
+</span><span id="VectorField2D.__init__-222"><a href="#VectorField2D.__init__-222"><span class="linenos">222</span></a>                <span class="p">)</span>
+</span><span id="VectorField2D.__init__-223"><a href="#VectorField2D.__init__-223"><span class="linenos">223</span></a>            <span class="k">if</span> <span class="n">n_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-224"><a href="#VectorField2D.__init__-224"><span class="linenos">224</span></a>                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-225"><a href="#VectorField2D.__init__-225"><span class="linenos">225</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-226"><a href="#VectorField2D.__init__-226"><span class="linenos">226</span></a>                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_along</span><span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">t_range</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-227"><a href="#VectorField2D.__init__-227"><span class="linenos">227</span></a>        <span class="k">elif</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-228"><a href="#VectorField2D.__init__-228"><span class="linenos">228</span></a>            <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-229"><a href="#VectorField2D.__init__-229"><span class="linenos">229</span></a>            <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-230"><a href="#VectorField2D.__init__-230"><span class="linenos">230</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="VectorField2D.__init__-231"><a href="#VectorField2D.__init__-231"><span class="linenos">231</span></a>            <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid_density</span><span class="p">,</span> <span class="n">grid_density</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">grid_density</span><span class="p">)</span> <span class="k">else</span> <span class="n">grid_density</span>
+</span><span id="VectorField2D.__init__-232"><a href="#VectorField2D.__init__-232"><span class="linenos">232</span></a>            <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">_linspace</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">nx</span><span class="p">),</span> <span class="n">_linspace</span><span class="p">(</span><span class="n">y_range</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
+</span><span id="VectorField2D.__init__-233"><a href="#VectorField2D.__init__-233"><span class="linenos">233</span></a>
+</span><span id="VectorField2D.__init__-234"><a href="#VectorField2D.__init__-234"><span class="linenos">234</span></a>        <span class="c1"># ---- evaluate F at those points ----</span>
+</span><span id="VectorField2D.__init__-235"><a href="#VectorField2D.__init__-235"><span class="linenos">235</span></a>        <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">_numeric</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</span><span id="VectorField2D.__init__-236"><a href="#VectorField2D.__init__-236"><span class="linenos">236</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span>
+</span><span id="VectorField2D.__init__-237"><a href="#VectorField2D.__init__-237"><span class="linenos">237</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</span></pre></div>
+
+
+            <div class="docstring"><ul>
+<li><p>f : Function R^2 -> R^2</p></li>
+<li><p>x_range, y_range : (float, float)  bounds of the sampling window</p></li>
+<li><p>n : int or (int, int)  grid density; ignored if points/along given</p></li>
+<li><p>points : list of (x, y)  sample locations; mutually exclusive with along</p></li>
+<li><p>along : Function R -> R^2  sample on the curve</p></li>
+<li><p>scale : float or None  forwarded to ax.quiver's scale; None = auto</p></li>
+<li><p>**style : forwarded to ax.quiver (width, headwidth, pivot, ...)</p></li>
+</ul>
+</div>
+
+
+                            </div>
+                            <div id="VectorField2D.f" class="classattr">
+                                <div class="attr variable">
+            <span class="name">f</span>
+
+        
+    </div>
+    <a class="headerlink" href="#VectorField2D.f"></a>
+    
+    
+
+                            </div>
+                            <div id="VectorField2D.scale" class="classattr">
+                                <div class="attr variable">
+            <span class="name">scale</span>
+
+        
+    </div>
+    <a class="headerlink" href="#VectorField2D.scale"></a>
+    
+    
+
+                            </div>
+                            <div id="VectorField2D.color" class="classattr">
+                                <div class="attr variable">
+            <span class="name">color</span>
+
+        
+    </div>
+    <a class="headerlink" href="#VectorField2D.color"></a>
+    
+    
+
+                            </div>
+                            <div id="VectorField2D.style" class="classattr">
+                                <div class="attr variable">
+            <span class="name">style</span>
+
+        
+    </div>
+    <a class="headerlink" href="#VectorField2D.style"></a>
+    
+    
+
+                            </div>
+                            <div id="VectorField2D.render" class="classattr">
+                                        <input id="VectorField2D.render-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">render</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">ax</span>, </span><span class="param"><span class="o">**</span><span class="n">kw</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="VectorField2D.render-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#VectorField2D.render"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="VectorField2D.render-252"><a href="#VectorField2D.render-252"><span class="linenos">252</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+</span><span id="VectorField2D.render-253"><a href="#VectorField2D.render-253"><span class="linenos">253</span></a>        <span class="n">merged</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">}</span>
+</span><span id="VectorField2D.render-254"><a href="#VectorField2D.render-254"><span class="linenos">254</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="VectorField2D.render-255"><a href="#VectorField2D.render-255"><span class="linenos">255</span></a>            <span class="n">merged</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"color"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+</span><span id="VectorField2D.render-256"><a href="#VectorField2D.render-256"><span class="linenos">256</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="o">**</span><span class="n">merged</span><span class="p">)</span>
+</span><span id="VectorField2D.render-257"><a href="#VectorField2D.render-257"><span class="linenos">257</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="VectorField2D.render-258"><a href="#VectorField2D.render-258"><span class="linenos">258</span></a>        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </span></pre></div>
 
 

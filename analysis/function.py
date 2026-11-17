@@ -25,7 +25,7 @@ except ImportError:
 
 _PLOT_REGISTRY = {}
 
-def dispatch(f, dim, **kwargs):
+def _dispatch(f, dim, **kwargs):
     """Instantiate the plot class registered for (f, dim)."""
     if not _PLOT_REGISTRY:
         raise ValueError(
@@ -39,7 +39,7 @@ def dispatch(f, dim, **kwargs):
 
 # ==== Utils ====
 
-def duplicates(l):
+def _duplicates(l):
     seen = set()
     for x in l:
         if x in seen:
@@ -67,7 +67,7 @@ class Function:
         """
         if not isinstance(args, list):
             raise ValueError("Arguments have to be in a list, even if there is only one")
-        if duplicates(args):
+        if _duplicates(args):
             raise ValueError("Duplicate argument symbols")
         argset = set(args)
         cm = Matrix(coords)
@@ -83,6 +83,7 @@ class Function:
 
     @property
     def name(self):
+        """For LaTeX display"""
         return self._name
 
     @property
@@ -145,20 +146,17 @@ class Function:
 
         (i) argvals is a list of pairs (symbol, value);
 
-        (ii) every symbol in argvals is among self's args, with no
-            duplicates.
+        (ii) every symbol in argvals is among self's args, with no duplicates.
 
-        (iii) at least one argument of self is left free (freezing all
-            arguments would give a point, not a function).
+        (iii) at least one argument of self is left free (freezing all arguments would give a point, not a function).
 
         Returns a new Function in the remaining arguments. If name is
-        None, the name is auto-generated as "<self._name>|<sym>=<val>,...",
-        which renders in LaTeX as a restriction of self.
+        None, the name is auto-generated and renders in LaTeX as a restriction of self.
         """
         if not argvals:
             raise ValueError("argvals must be a non-empty list of (symbol, value) pairs")
         syms = [s for (s, _) in argvals]
-        if duplicates(syms):
+        if _duplicates(syms):
             raise ValueError("Duplicate symbols in argvals")
         if not set(syms) <= set(self.args):
             raise ValueError("Frozen symbols must be among self's arguments")
@@ -178,28 +176,25 @@ class Function:
     # ---- calculus ----
     def diff(self):
         """
+        Differential  
+        $$D_f: \\mathbb{R}^d \\rightarrow \\mathbb{R}^{m \\times d}$$ 
+
         Precondition: self must be a vector-valued function $f: \\mathbb{R}^d \\rightarrow \\mathbb{R}^m$ for some 
         $d,n \\in \\mathbb{R}$
-
-        Returns self's differential (a.k.a. *total derivative*) 
-        $D_f: \\mathbb{R}^d \\rightarrow \\mathbb{R}^{m \\times d}$ (notice that it is a new function).
         """
         if self._kind() == "other":
             raise ValueError("diff() is for m x 1 matrices (scalar or vector functions)")
-        return Function(
-            "D_" + self._name,
-            self.args,
-            [[c.diff(s) for s in self.args] for c in self.coord_matrix.col(0)],
-        )
+        return Function("D_" + self._name, self.args, [[c.diff(s) for s in self.args] for c in self.coord_matrix.col(0)],)
 
     def grad(self):
         """
+        Gradient 
+        $$\\nabla_f: \\mathbb{R}^d \\rightarrow \\mathbb{R}^d$$
+
         Precondition: self must be scalar-valued function $f: \\mathbb{R}^d \\rightarrow \\mathbb{R}$ for some 
         $d \\in \\mathbb{R}$
 
-        Returns self's gradient $\\nabla_f: \\mathbb{R}^d \\rightarrow \\mathbb{R}^d$, i.e. the vector 
-        field obtained by transposing self's differential $D_f: \\mathbb{R}^d \\rightarrow \\mathbb{R}^{1 \\times d}$ 
-        (notice that it is a new function).
+        Notice that this is the vector field obtained by transposing the differential.
         """
         if self._kind() != "scalar":
             raise ValueError("grad() is only for scalar functions; use diff() otherwise")
@@ -215,16 +210,16 @@ class Function:
         return result
 
     def integrate_1d(self, t_range, numeric=False):
-        r"""
+        """
         Integral of a scalar function of one variable over a parameter interval:
 
-            $\int_{t_0}^{t_1} f(t) \, dt$
+        $$\\int_{t_0}^{t_1} f(t) \\, dt$$
 
-        Preconditions:
-        (i) self is a scalar function $f: \mathbb{R} \to \mathbb{R}$.
+        Precondition:
+        self is a scalar function $f: \\mathbb{R} \\rightarrow \\mathbb{R}$.
 
-        Common use: arc length of a curve, as $\int ||C'(t)|| \, dt$ with
-        $f = ||C'||$ (see `speed()`).
+        Common use: arc length of a curve, as $\\int ||C'(t)|| \\, dt$ with
+        $f = ||C'||$.
         """
         if self._kind() != "scalar" or self.dom() != 1:
             raise ValueError("integrate_1d needs a scalar function R -> R")
@@ -249,6 +244,11 @@ class Function:
 
     def integrate(self, Phi, s_range, t_range, numeric=False):
         """
+        Integral
+        $$
+            \\int_\\mathbf{D} \\, f \\, dx \\, dy = \\int_\\mathbf{D} f(\\Phi(s,t)) · det(D_{\\Phi}(s,t)) \\, dt \\, ds
+        $$
+
         Preconditions: 
         
         $(i)$ self must be a scalar-valued function $f: \\mathbb{R}^2 \\rightarrow \\mathbb{R}$
@@ -259,11 +259,6 @@ class Function:
         given the precondition no absolute value is taken
         (polar, cylindrical, spherical, and all the usual textbook parametrizations satisfy this on their standard 
         domains).
-        
-        Returns the integral
-        $$
-            \\int_\\mathbf{D} \\, f \\, dx \\, dy = \\int_\\mathbf{D} f(\\Phi(s,t)) · det(D_{\\Phi}(s,t)) \\, dt \\, ds
-        $$
         
         The value here is by default a SymPy expression (the exact integral, or an unevaluated
         integral if SymPy cannot do it). **Warning**: performance can be a bottleneck, even if SymPy is capable
@@ -305,11 +300,14 @@ class Function:
 
     def integrate_along(self, gamma, t_range, numeric=False):
         """
-            Line integral of a vector field:  ∫_γ F · dr = ∫_{t0}^{t1} F(γ(t)) · γ'(t) dt.
+            Line integral of a vector field:  
+            $$ \\int_\\gamma F dr = \\int_{t0}^{t1} F(\\gamma(t)) \\cdot \\gamma'(t) dt$$
+            
     
             Preconditions:
-            (i)  self  is a vector field F: R^n -> R^n  (vector, cod == (n, 1))
-            (ii) gamma is a curve γ: R -> R^n matching F's dimension
+            (i)  self  is a vector field $F: \\mathbb{R}^n \\rightarrow \\mathbb{R}^n$
+
+            (ii) gamma is a curve $\\gamma: \\mathbb{R} \\rightarrow \\mathbb{R}^n$ matching $F$'s dimension
     
             Orientation: reversing t_range reverses the sign, as expected.
         """
@@ -349,15 +347,17 @@ class Function:
         return result
 
     def integrate_over(self, S, u_range, v_range, numeric=False):
-        r"""
+        """
         Flux of a vector field across a parametric surface:
 
-            $\int_S F \cdot dS = \int_{u_0}^{u_1} \int_{v_0}^{v_1} F(S(u,v)) \cdot (S_u \times S_v) \, dv \, du$
+        $$\\int_S F \\cdot dS = \\int_{u_0}^{u_1} \\int_{v_0}^{v_1} F(S(u,v)) \\cdot (S_u \\times S_v) \\, dv \\, du$$
 
         Preconditions:
-        (i)  self is a vector field $F : \mathbb{R}^3 \to \mathbb{R}^3$;
-        (ii) S is a parametric surface $S : \mathbb{R}^2 \to \mathbb{R}^3$;
-        (iii) the orientation of S (given by $S_u \times S_v$) is the one
+        (i)  self is a vector field $F : \\mathbb{R}^3 \\to \\mathbb{R}^3$;
+
+        (ii) S is a parametric surface $S : \\mathbb{R}^2 \\to \\mathbb{R}^3$;
+
+        (iii) the orientation of S (given by $S_u \\times S_v$) is the one
                 the user intends — reversing a parameter range reverses the sign.
 
         The result may be negative; that is the orientation, not an error.
@@ -412,18 +412,19 @@ class Function:
 
     def surface_area(self, u_range, v_range, numeric = True):
         """
-        Precondition: self must be a vector-valued function $f(u,v): \\mathbb{R}^2 \\rightarrow \\mathbb{R}^3$ 
-        
-        Returns the surface area delimited by $f$ over some domain $\\mathbf{D} = [u_0,u_1] \\times [v_0,v_1]$ computed as
+        The surface area delimited by $f$ over some domain $\\mathbf{D} = [u_0,u_1] \\times [v_0,v_1]$, computed as
         $$
             \\int_{\\mathbf{D}} \\| \\Phi_u \\times \\Phi_v \\| \\, du \\, dv 
         $$
+        where $\\Phi_u$ and $\\Phi_v$ are the partial derivatives of the coordinate functions.
 
-        where $\\Phi_u$ and $\\Phi_v$ are the partial derivatives of the coordinate functions. The value here is by default a 
+        Precondition: self must be a vector-valued function $f(u,v): \\mathbb{R}^2 \\rightarrow \\mathbb{R}^3$ 
+        
+        The value here is by default a 
         float. If `numeric=False` it is a SymPy expression
         (exact, or an unevaluated integral if
         SymPy cannot do it). **Warning**: performanace can be a 
-        bottleneck, even if SymPy is capable of providing an exact value. If precision is not $\\mathtt{None$}, the method returns a float. 
+        bottleneck, even if SymPy is capable of providing an exact value. If precision is not $\\mathtt{None}$, the method returns a float. 
 
         Notice that orientation is not an issue here, since a norm is positive.
         """
@@ -447,21 +448,21 @@ class Function:
 
     def volume(self, r_range, s_range, t_range, numeric=True):
         """
-        Precondition: self must be a vector-valued function $f(r,s,t): \\mathbb{R}^3 \\rightarrow \\mathbb{R}^3$ 
-        which is *orientation-preserving* over 
-        $\\mathbf{D} = [r_0,r_1] \\times [s_0,s_1] \\times [t_0,t_1]$ 
-        
-        Returns the volume delimited by $f$ overd $\\mathbf{D}$, computed as
+        The volume delimited by $f$ overd $\\mathbf{D}$, computed as
         $$
             \\int_\\mathbf{D} det(D_f) \\, dr \\, ds \\, dt
         $$
+
+        Precondition: self must be a vector-valued function $f(r,s,t): \\mathbb{R}^3 \\rightarrow \\mathbb{R}^3$ 
+        which is *orientation-preserving* over $\\mathbf{D} = [r_0,r_1] \\times [s_0,s_1] \\times [t_0,t_1]$ 
+
+        Notice that unlike what happens in the case of a surface area where an explicit domain parametrisation must be provided, in the case of 
+        a volume the parametrisation in question is the function itself.
+        
         The value here is by default a float. If `numeric = False` it is a
         SymPy expression (exact, or an unevaluated Integral if SymPy cannot do it). 
         **Warning**: performanace can be a 
         bottleneck, even if SymPy is capable of providing an exact value. 
-        
-        Notice that unlike what happens in the case of a surface area where an explicit domain parametrisation must be provided, in the case of 
-        a volume the parametrisation in question is the function itself. 
         """
         if self._kind() != "vector" or self.dom() != 3 or self.cod() != (3, 1):
             raise ValueError("volume() needs a parametric solid R^3 -> R^3 (3 x 1)")
@@ -500,14 +501,14 @@ class Function:
         return t, Fx * gy.diff(t) - Fy * gx.diff(t)
 
     def flux_across(self, gamma, t_range, numeric=False):
-        r"""
+        """
         Flux of a plane vector field across a curve (2D divergence form of Green):
 
-            $\oint_C F \cdot n \, ds = \int_{t_0}^{t_1} F(\gamma(t)) \cdot n \, |\gamma'(t)| \, dt$
+        $$\\oint_C F \\cdot n \\, ds = \\int_{t_0}^{t_1} F(\\gamma(t)) \\cdot n \\, ||\\gamma'(t)|| \\, dt$$
 
-        where $n = (\gamma'_y, -\gamma'_x)/|\gamma'|$ is the outward normal for
-        counterclockwise traversal. The $|\gamma'|$ cancels, so the integrand is
-        $F_x \gamma'_y - F_y \gamma'_x$.
+        where $n = (\\gamma'_y, -\\gamma'_x)/||\\gamma'||$ is the outward normal for
+        counterclockwise traversal. The $||\\gamma'||$ cancels, so the integrand is
+        $F_x \\gamma'_y - F_y \\gamma'_x$.
 
         Orientation: reversing t_range reverses the sign.
         """
@@ -531,14 +532,14 @@ class Function:
         return result
 
     def div(self):
-        r"""
+        """
         Divergence of a vector field:
 
-            $\nabla \cdot F = \sum_{i=1}^{n} \frac{\partial F_i}{\partial x_i}$
+        $$\\nabla \\cdot F = \\sum_{i=1}^{n} \\frac{\\partial F_i}{\\partial x_i}$$
 
-        Precondition: self is a vector field $F: \mathbb{R}^n \to \mathbb{R}^n$.
+        Precondition: self is a vector field $F: \\mathbb{R}^n \\to \\mathbb{R}^n$.
 
-        Returns a scalar function $\mathbb{R}^n \to \mathbb{R}$ (a new Function).
+        Returns a scalar function $\\mathbb{R}^n \\to \\mathbb{R}$ (a new Function).
         """
         if self._kind() != "vector" or self.cod() != (self.dom(), 1):
             raise ValueError("div() needs a vector field F: R^n -> R^n")
@@ -547,14 +548,14 @@ class Function:
         return Function("div " + self._name, self.args, [expr])
 
     def curl(self):
-        r"""
+        """
         Curl of a plane vector field, in its scalar form:
 
-            $\operatorname{curl} F = \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y}$
+        $$\\operatorname{curl} F = \\frac{\\partial F_2}{\\partial x} - \\frac{\\partial F_1}{\\partial y}$$
 
-        Precondition: self is a vector field $F: \mathbb{R}^2 \to \mathbb{R}^2$.
+        Precondition: self is a vector field $F: \\mathbb{R}^2 \\to \\mathbb{R}^2$.
 
-        Returns a scalar function $\mathbb{R}^2 \to \mathbb{R}$ (a new Function).
+        Returns a scalar function $\\mathbb{R}^2 \\to \\mathbb{R}$ (a new Function).
 
         Note: in 2D the curl of a vector field is a scalar, not a vector — it is
         the $z$-component of the 3D curl of $(F_1, F_2, 0)$. The 3D vector-valued
@@ -573,11 +574,11 @@ class Function:
     def plot(self, plot_classification, **kwargs):
         """
         Constructs the correct `Matplotlib` plot in memory if applicable, it is the responsability of the user to place it in a Canvas object for
-        display (cf. the `graphics` module).
+        plotting (cf. the `graphics` module).
 
         The call is highly context-sensitive, since by far not any function that can abstractly be handled by the class `Function` is eligible
         for visualisation. Notice that this is an intrinsic limitation of human spatial senses, due to the way we evolved as species. Furthermore, 
-        certain eligible functions can admit different visualtions, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as
+        certain eligible functions can admit different visualisations, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as
         a surface or as a set of level curves.
 
         For these reasons, the method `plot` needs a classification provided by the argement `plot_classification`, which takes the strings '2d' or '3d'
@@ -593,13 +594,15 @@ class Function:
         | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$    | `3d`                  | `x_range = (min,max)`, `y_range = (min,max)`  | `Surface`              |
         | $\\mathbb{R} \\rightarrow \\mathbb{R}^2$    | `2d`                  | `t_range= (min,max)`                          | `ParametricCurve2D`    |
         | $\\mathbb{R} \\rightarrow \\mathbb{R}^3$    | `3d`                  | `t_range = (min,max)`                         | `ParametricCurve3D`    |
-        | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}^3$  | `3d`                  | `u_range = (min,max)`, `v_range = (min,max)`  | `Parametricsurface3D`  |        
+        | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}^3$  | `3d`                  | `u_range = (min,max)`, `v_range = (min,max)`  | `ParametricSurface3D`  |
+        | $\\mathbb{R}^2 \\rightarrow \\mathbb{R}^2$  | `2d`                  | `x_range = (min,max)`, `x_range = (min,max)`  | `VectorField2D`        |
+                                        
 
         The column with the dispatches is purely informative (a dispatch is part of the software architecture, not a user-level action).
         The range arguments are passed as `**kwargs` as their names and their number vary. Notice that other arguments (for instance 
         those specifying a color or a color map) can be passed as `**kwargs` as well.  
         """
-        return dispatch(self, plot_classification, **kwargs)
+        return _dispatch(self, plot_classification, **kwargs)
 
     # ==== Display ====
     

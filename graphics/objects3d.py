@@ -14,17 +14,15 @@ import numpy as np
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
-from .canvas import Renderable
+from .canvas import Renderable, _to_float, _num
 
 
 # ==== Point3D ====
 class Point3D(Renderable):
     """A single point (x, y, z) drawn as a marker."""
 
-    def __init__(self, x, y, z, **style):
-        self.x = x
-        self.y = y
-        self.z = z
+    def __init__(self, p, **style):
+        self.p = _to_float(p)
         style.setdefault("color", "black")
         style.setdefault("marker", "o")
         style.setdefault("zorder", 5)
@@ -32,7 +30,7 @@ class Point3D(Renderable):
 
     def render(self, ax, **kw):
         merged = {**self.style, **kw}
-        return ax.scatter([self.x], [self.y], [self.z], **merged)
+        return ax.scatter([self.p[0]], [self.p[1]], [self.p[2]], **merged)
 
 
 # ==== Line3D ====
@@ -40,8 +38,8 @@ class Line3D(Renderable):
     """Line segment between two points p and q in R^3."""
 
     def __init__(self, p, q, **style):
-        self.p = p
-        self.q = q
+        self.p = _to_float(p)
+        self.q = _to_float(q)
         style.setdefault("color", "black")
         style.setdefault("zorder", 4)
         self.style = style
@@ -65,29 +63,34 @@ class Vector3D(Renderable):
     """
 
     def __init__(self, origin, tip, **style):
-        self.origin = origin
-        self.tip = tip
+        self.origin = _to_float(origin)
+        self.tip = _to_float(tip)
         style.setdefault("color", "black")
-        style.setdefault("arrowstyle", "-|>")
-        style.setdefault("mutation_scale", 15)
+        #style.setdefault("arrowstyle", "-|>")
+        #style.setdefault("mutation_scale", 15)
         style.setdefault("linewidth", 1.5)
         self.style = style
+
+    # def render(self, ax, **kw):
+    #     merged = {**self.style, **kw}
+    #     ox, oy, oz = self.origin
+    #     tx, ty, tz = self.tip
+
+    #     # Project 3D points to 2D display coordinates.
+    #     x0, y0, _ = proj3d.proj_transform(ox, oy, oz, ax.get_proj())
+    #     x1, y1, _ = proj3d.proj_transform(tx, ty, tz, ax.get_proj())
+
+    #     arrow = FancyArrowPatch((x0, y0), (x1, y1),transform=ax.transData, **merged)
+    #     ax.add_patch(arrow)
+    #     return arrow
 
     def render(self, ax, **kw):
         merged = {**self.style, **kw}
         ox, oy, oz = self.origin
         tx, ty, tz = self.tip
-
-        # Project 3D points to 2D display coordinates.
-        x0, y0, _ = proj3d.proj_transform(ox, oy, oz, ax.get_proj())
-        x1, y1, _ = proj3d.proj_transform(tx, ty, tz, ax.get_proj())
-
-        arrow = FancyArrowPatch(
-            (x0, y0), (x1, y1),
-            transform=ax.transData, **merged,
-        )
-        ax.add_patch(arrow)
-        return arrow
+        #return ax.quiver(ox, oy, oz, tx - ox, ty - oy, tz - oz, **merged)
+        return ax.quiver(ox, oy, oz, tx - ox, ty - oy, tz - oz, arrow_length_ratio=0.3, **merged)
+        # head-size fraction of the arrow
 
 # ==== Plane ====
 class Plane(Renderable):
@@ -114,9 +117,9 @@ class Plane(Renderable):
 
         - color : optional
         """
-        self.p = p
-        self.normal = normal
-        self.size = size
+        self.p = _to_float(p)
+        self.normal = _to_float(normal)
+        self.size = _num(size)
         self.n = n
         self.cmap = cmap
         self.color = color
@@ -124,8 +127,8 @@ class Plane(Renderable):
         style.setdefault("alpha", self.alpha)
         self.style = style
 
-        px, py, pz = p
-        nx, ny, nz = normal
+        px, py, pz = self.p
+        nx, ny, nz = self.normal
         norm = np.sqrt(nx*nx + ny*ny + nz*nz)
         if norm == 0:
             raise ValueError("Plane normal must be nonzero")
@@ -141,8 +144,8 @@ class Plane(Renderable):
         u /= np.linalg.norm(u)
         v = np.cross(nvec, u)
 
-        s = np.linspace(-size/2, size/2, max(n, 2))
-        t = np.linspace(-size/2, size/2, max(n, 2))
+        s = np.linspace(-self.size/2, self.size/2, max(n, 2))
+        t = np.linspace(-self.size/2, self.size/2, max(n, 2))
         S, T = np.meshgrid(s, t)
         self.X = px + S*u[0] + T*v[0]
         self.Y = py + S*u[1] + T*v[1]

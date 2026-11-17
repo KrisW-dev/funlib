@@ -235,16 +235,29 @@ class VectorField2D(Renderable):
         self.X, self.Y = xs, ys
         self.U, self.V = u, v
 
+    #@staticmethod
+    # def _sample_along(along, t_range,n_samples=30):
+    #     """Sample a curve γ: R → R^2 at n parameter values in [0, n_samples]."""
+    #     _check_function(along)
+    #     if along._kind() != "vector" or along.dom() != 1 or along.cod() != (2, 1):
+    #         raise ValueError(
+    #             "along= must be a Function R -> R^2 (a parametric curve); "
+    #             "to overlay its plot, add the curve separately"
+    #         )
+    #     t = np.linspace(float(t_range[0]), float(t_range[1]), n_samples)
+    #     x, y = _numeric(along)(t)
+    #     return x, y
+
     @staticmethod
-    def _sample_along(along, t_range,n_samples=30):
-        """Sample a curve γ: R → R^2 at n parameter values in [0, n_samples]."""
+    def _sample_along(along, t_range, n_samples=30):
+        """Sample a curve γ: R → R^2 at n_samples parameter values over t_range."""
         _check_function(along)
         if along._kind() != "vector" or along.dom() != 1 or along.cod() != (2, 1):
             raise ValueError(
                 "along= must be a Function R -> R^2 (a parametric curve); "
                 "to overlay its plot, add the curve separately"
             )
-        t = np.linspace(float(t_range[0]), float(t_range[1]), n_samples)
+        t = _linspace(t_range, n_samples)          # was np.linspace(float(...), float(...), n_samples)
         x, y = _numeric(along)(t)
         return x, y
 

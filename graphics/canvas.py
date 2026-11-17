@@ -5,6 +5,16 @@ Graphics layer: canvases and the Renderable protocol.
 
 import matplotlib.pyplot as plt
 
+# ==== Just for for export ====
+
+def _to_float(p):
+    """Coerce a point to a tuple of floats, accepting SymPy expressions."""
+    return tuple(float(c) for c in p)
+
+def _num(x):
+    """Coerce a scalar to float, accepting SymPy expressions."""
+    return float(x)
+
 # ==== Renderable protocol ====
 class Renderable:
     """..."""

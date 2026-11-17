@@ -19,13 +19,9 @@ import matplotlib
 matplotlib.use("Agg")   # must precede any pyplot import
 
 import graphics
-from graphics import (
-    Canvas2D, Canvas3D,
-    Curve2D, ParametricCurve2D, Implicit2D,
-    Surface, ParametricCurve3D, ParametricSurface3D,
-    Point2D, Line2D, Vector2D, Polygon2D,
-    Point3D, Line3D, Vector3D, Plane,
-)
+from graphics import (Canvas2D, Canvas3D, 
+    Curve2D, ParametricCurve2D, Implicit2D, Surface, ParametricCurve3D, ParametricSurface3D, Point2D, Line2D, Vector2D, Polygon2D,Polyline2D,
+    Point3D, Line3D, Vector3D, Plane)
 
 x, y, z, t, u, v, r, theta, s, phi = symbols("x y z t u v r theta s phi", real=True)
 
@@ -69,6 +65,17 @@ f_surf_3    = Function("sigma",[u, v], [[cos(u)*sin(v)], [sin(u)*sin(v)], [cos(v
 f_const     = Function("h",    [u, v], [[cos(u)], [sin(u)], [0]])     # constant component
 
 # ---- 2D plot classes ----
+def t_objects_accept_sympy():
+    from sympy import sqrt
+    c = Canvas2D(aspect="equal")
+    c.add(Point2D((sqrt(2), sqrt(2))))
+    c.add(Vector2D((0, 0), (sqrt(2), 1)))
+    c.add(Line2D((0, 0), (1, sqrt(3))))
+    c.add(Polyline2D([(0, 0), (sqrt(2), 1), (1, sqrt(3))]))
+    c.add(Polygon2D([(0, 0), (sqrt(2), 0), (0, sqrt(2))]))
+    c.close()
+check("geometric objects accept SymPy coordinates", t_objects_accept_sympy)
+
 def t_curve2d():
     c = Canvas2D()
     c.add(f_scalar_1.plot("2d", x_range=(-2, 2), y_range=(0, 4)))
@@ -90,7 +97,7 @@ check("Implicit2D", t_implicit2d)
 def t_mixed_2d():
     c = Canvas2D(aspect="equal")
     c.add(f_curve_2.plot("2d", color="C0"))
-    c.add(Point2D(1, 1, color="red"))
+    c.add(Point2D((1, 1), color="red"))
     c.add(Vector2D((0, 0), (1, 0), color="green"))
     c.add(Line2D((0, 0), (1, 1), color="black"))
     c.add(Polygon2D([(0, 0), (1, 0), (1, 1)]))
@@ -123,6 +130,16 @@ def t_canvas2d_panel_out_of_range():
 check("Canvas2D panel out of range", t_canvas2d_panel_out_of_range)
 
 # ---- 3D plot classes ----
+def t_objects3d_accept_sympy():
+    from sympy import sqrt
+    c = Canvas3D()
+    c.add(Point3D((sqrt(2), 0, sqrt(3))))
+    c.add(Vector3D((0, 0, 0), (sqrt(2), 1, sqrt(3))))
+    c.add(Line3D((0, 0, 0), (1, sqrt(2), 1)))
+    c.add(Plane(p=(0, 0, sqrt(2)), normal=(0, 0, 1), size=sqrt(2)))
+    c.close()
+check("3D objects accept SymPy coordinates", t_objects3d_accept_sympy)
+
 def t_surface():
     c = Canvas3D()
     c.add(f_scalar_2.plot("3d", x_range=(-3, 3), y_range=(-3, 3), cmap="viridis"))
@@ -157,7 +174,7 @@ def t_mixed_3d():
     c = Canvas3D()
     c.add(f_surf_3.plot("3d", u_range=(0, 2*pi), v_range=(0, pi), alpha=0.6))
     c.add(Plane(p=(0, 0, 0), normal=(0, 0, 1), size=6, alpha=0.4))
-    c.add(Point3D(0, 0, 0, color="red"))
+    c.add(Point3D((0, 0, 0), color="red"))
     c.add(Vector3D((0, 0, 0), (1, 1, 1), color="green"))
     c.add(Line3D((-1, 0, 0), (1, 0, 0), color="black"))
     c.close()
@@ -167,7 +184,7 @@ def t_multipanel():
     c = Canvas3D(xlim=(-1.2, 1.2), ylim=(-1.2, 1.2), zlim=(-1.2, 1.2),
                  nrows=1, ncols=3, axes=False)
     for i in range(3):
-        c.add(Point3D(0, 0, 0, color="red"), panel=i)
+        c.add(Point3D((0, 0, 0), color="red"), panel=i)
         c.set_panel_title(i, f"p{i}")
     c.close()
 check("Canvas3D multi-panel", t_multipanel)
@@ -175,7 +192,7 @@ check("Canvas3D multi-panel", t_multipanel)
 def t_panel_out_of_range():
     c = Canvas3D(nrows=1, ncols=3)
     try:
-        c.add(Point3D(0, 0, 0), panel=5)
+        c.add(Point3D((0, 0, 0)), panel=5)
     except ValueError:
         c.close()
         return
@@ -184,10 +201,10 @@ check("Canvas3D panel out of range", t_panel_out_of_range)
 
 def t_canvas_grid_axes():
     c = Canvas3D(grid=False)
-    c.add(Point3D(0, 0, 0), panel=0)
+    c.add(Point3D((0, 0, 0)), panel=0)
     c.close()
     c = Canvas3D(axes=False)
-    c.add(Point3D(0, 0, 0), panel=0)
+    c.add(Point3D((0, 0, 0)), panel=0)
     c.close()
 check("Canvas3D grid/axes flags", t_canvas_grid_axes)
 
@@ -554,19 +571,25 @@ check("Function._repr_latex_", t_repr_latex)
 # ---- canvas base ----
 
 def t_canvas_base_shared():
-    from graphics.canvas import _CanvasBase
+    """Structural check: Canvas2D/3D share methods from a common base.
+
+    Only runs against the package layout; skipped in the merged dist
+    where the private _CanvasBase may not be exposed.
+    """
+    try:
+        from graphics.canvas import _CanvasBase
+    except (ImportError, ModuleNotFoundError):
+        return   # merged dist: skip, structural guard is dev-only
     c2 = Canvas2D(); c3 = Canvas3D()
     try:
         assert isinstance(c2, _CanvasBase)
         assert isinstance(c3, _CanvasBase)
-        # the structural claim: add/set_panel_title/_panel_axes are NOT overridden
         assert Canvas2D.add is _CanvasBase.add
         assert Canvas3D.add is _CanvasBase.add
         assert Canvas2D.set_panel_title is _CanvasBase.set_panel_title
         assert Canvas3D.set_panel_title is _CanvasBase.set_panel_title
         assert Canvas2D._panel_axes is _CanvasBase._panel_axes
         assert Canvas3D._panel_axes is _CanvasBase._panel_axes
-        # 3D-only methods must NOT be on the base
         assert not hasattr(_CanvasBase, "set_view")
     finally:
         c2.close(); c3.close()

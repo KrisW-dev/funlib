@@ -18,16 +18,14 @@ underlying matplotlib call in render().
 import numpy as np
 from matplotlib.patches import Polygon #Circle
 
-from .canvas import Renderable
-
+from .canvas import Renderable, _to_float, _num
 
 # ==== Point2D ====
 class Point2D(Renderable):
-    """A single point (x, y) drawn as a marker."""
+    """A single point p = (x, y) drawn as a marker."""
 
-    def __init__(self, x, y, **style):
-        self.x = x
-        self.y = y
+    def __init__(self, p, **style):
+        self.p = _to_float(p)
         style.setdefault("color", "black")
         style.setdefault("marker", "o")
         style.setdefault("zorder", 5)
@@ -35,7 +33,7 @@ class Point2D(Renderable):
 
     def render(self, ax, **kw):
         merged = {**self.style, **kw}
-        return ax.scatter([self.x], [self.y], **merged)
+        return ax.scatter([self.p[0]], [self.p[1]], **merged)
 
 
 # ==== Line2D ====
@@ -49,8 +47,8 @@ class Line2D(Renderable):
     """
 
     def __init__(self, p, q, extend=False, **style):
-        self.p = p
-        self.q = q
+        self.p = _to_float(p)
+        self.q = _to_float(q)
         self.extend = extend
         style.setdefault("color", "black")
         style.setdefault("zorder", 4)
@@ -83,8 +81,8 @@ class Vector2D(Renderable):
     """
 
     def __init__(self, origin, tip, **style):
-        self.origin = origin
-        self.tip = tip
+        self.origin = _to_float(origin)
+        self.tip = _to_float(tip)
         style.setdefault("angles", "xy")
         style.setdefault("scale_units", "xy")
         style.setdefault("scale", 1)
@@ -102,7 +100,7 @@ class Polygon2D(Renderable):
     """Closed polygon through the given vertices (list of (x, y))."""
 
     def __init__(self, vertices, **style):
-        self.vertices = list(vertices)
+        self.vertices = [_to_float(v) for v in vertices]
         style.setdefault("fill", False)
         style.setdefault("color", "black")
         self.style = style
@@ -122,7 +120,7 @@ class Polyline2D(Renderable):
     """
 
     def __init__(self, points, **style):
-        self.points = list(points)
+        self.points = [_to_float(p) for p in points]
         style.setdefault("color", "black")
         style.setdefault("zorder", 4)
         self.style = style
