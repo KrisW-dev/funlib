@@ -8,6 +8,11 @@ from .func2d import Curve2D, ParametricCurve2D, Implicit2D, VectorField2D
 from .func3d import Surface, ParametricCurve3D, ParametricSurface3D
 from .objects2d import Point2D, Line2D, Vector2D, Polygon2D, Polyline2D
 from .objects3d import Point3D, Line3D, Vector3D, Plane
+from analysis.geometry import Point, Vector
+from .geometry_plots import _plot_vector_2d, _plot_vector_3d, _plot_point_2d, _plot_point_3d
+
+# from .geometry_plots import register_geometry_plots
+# register_geometry_plots()
 
 from analysis.function import _PLOT_REGISTRY
 
@@ -24,6 +29,15 @@ _PLOT_REGISTRY.update({
     # ("vector", 3, 3): {"2d": None,            "3d": VectorField3D},  # incl. grad() of R^3 -> R
 })
 
+from analysis.geometry import _GEOMETRY_PLOT_REGISTRY
+
+_GEOMETRY_PLOT_REGISTRY.update({
+    (Vector, 2): _plot_vector_2d,
+    (Vector, 3): _plot_vector_3d,
+    (Point, 2): _plot_point_2d,
+    (Point, 3): _plot_point_3d,
+})
+
 __all__ = [
     # canvas
     "Canvas2D", "Canvas3D", "Renderable",
@@ -36,3 +50,7 @@ __all__ = [
     # 3D objects
     "Point3D", "Line3D", "Vector3D", "Plane",
 ]
+
+
+
+

@@ -13,7 +13,7 @@ import sys
 import numpy as np
 from sympy import symbols, cos, sin, pi, Rational, sqrt
 
-from analysis import Function
+from analysis import Function, Vector, Point
 
 import matplotlib
 matplotlib.use("Agg")   # must precede any pyplot import
@@ -22,6 +22,7 @@ import graphics
 from graphics import (Canvas2D, Canvas3D, 
     Curve2D, ParametricCurve2D, Implicit2D, Surface, ParametricCurve3D, ParametricSurface3D, Point2D, Line2D, Vector2D, Polygon2D,Polyline2D,
     Point3D, Line3D, Vector3D, Plane)
+
 
 x, y, z, t, u, v, r, theta, s, phi = symbols("x y z t u v r theta s phi", real=True)
 
@@ -55,6 +56,14 @@ def check(name, fn, timeout=60):
 def approx(a, b, tol=1e-6):
     if abs(float(a) - float(b)) > tol:
         raise AssertionError(f"{a} != {b} (tol {tol})")
+
+# ---- geometry ----
+
+assert isinstance(Vector([3, 4]).plot(), Vector2D)
+assert isinstance(Vector([1, 1]).plot(origin=Point([2, 2])), Vector2D)
+assert isinstance(Vector([1, 0, 0]).plot(origin=[1, 1, 1]), Vector3D)
+assert isinstance(Point([1, 2]).plot(), Point2D)
+assert isinstance(Point([1, 2, 3]).plot(), Point3D)
 
 # ---- functions of each shape ----
 f_scalar_1  = Function("f",    [x],    [[x**2]])                      # R -> R
@@ -128,6 +137,11 @@ def t_canvas2d_panel_out_of_range():
         return
     raise AssertionError("expected ValueError for panel out of range")
 check("Canvas2D panel out of range", t_canvas2d_panel_out_of_range)
+
+# canvas idiom
+canv = Canvas2D()
+canv.add(Vector([3, 4]).plot(origin=Point([1, 1])))
+assert canv is not None
 
 # ---- 3D plot classes ----
 def t_objects3d_accept_sympy():

@@ -123,6 +123,63 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#Vector">Vector</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#Vector.__init__">Vector</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.dom">dom</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.entries">entries</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.as_matrix">as_matrix</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.dot">dot</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.norm">norm</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.cross">cross</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.to_point">to_point</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Vector.plot">plot</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#Point">Point</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#Point.__init__">Point</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Point.dom">dom</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Point.coords">coords</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Point.to_vector">to_vector</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#Point.plot">plot</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="variable" href="#_GEOMETRY_PLOT_REGISTRY">_GEOMETRY_PLOT_REGISTRY</a>
+            </li>
     </ul>
 
 
@@ -147,15 +204,16 @@ symbolic expressions.</p>
 
                         <label class="view-source-button" for="mod-analysis-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">"""</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">User API: multivariate functions based on [SymPy](https://www.sympy.org). The user is required to know how to declare symbols and form </span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="sd">symbolic expressions.</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a><span class="sd">"""</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.function</span><span class="w"> </span><span class="kn">import</span> <span class="n">Function</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Function"</span><span class="p">]</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">"""</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">User API: multivariate functions based on [SymPy](https://www.sympy.org). The user is required to know how to declare symbols and form </span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">symbolic expressions.</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">"""</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.function</span><span class="w"> </span><span class="kn">import</span> <span class="n">Function</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vector</span><span class="p">,</span> <span class="n">Point</span><span class="p">,</span> <span class="n">_GEOMETRY_PLOT_REGISTRY</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Function"</span><span class="p">,</span><span class="s2">"Vector"</span><span class="p">,</span><span class="s2">"Point"</span><span class="p">,</span><span class="s2">"_GEOMETRY_PLOT_REGISTRY"</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -696,11 +754,11 @@ symbolic expressions.</p>
 </span><span id="Function-575"><a href="#Function-575"><span class="linenos">575</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_classification</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 </span><span id="Function-576"><a href="#Function-576"><span class="linenos">576</span></a><span class="w">        </span><span class="sd">"""</span>
 </span><span id="Function-577"><a href="#Function-577"><span class="linenos">577</span></a><span class="sd">        Constructs the correct `Matplotlib` plot in memory if applicable, it is the responsability of the user to place it in a Canvas object for</span>
-</span><span id="Function-578"><a href="#Function-578"><span class="linenos">578</span></a><span class="sd">        display (cf. the `graphics` module).</span>
+</span><span id="Function-578"><a href="#Function-578"><span class="linenos">578</span></a><span class="sd">        plotting (cf. the `graphics` module).</span>
 </span><span id="Function-579"><a href="#Function-579"><span class="linenos">579</span></a>
 </span><span id="Function-580"><a href="#Function-580"><span class="linenos">580</span></a><span class="sd">        The call is highly context-sensitive, since by far not any function that can abstractly be handled by the class `Function` is eligible</span>
 </span><span id="Function-581"><a href="#Function-581"><span class="linenos">581</span></a><span class="sd">        for visualisation. Notice that this is an intrinsic limitation of human spatial senses, due to the way we evolved as species. Furthermore, </span>
-</span><span id="Function-582"><a href="#Function-582"><span class="linenos">582</span></a><span class="sd">        certain eligible functions can admit different visualtions, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as</span>
+</span><span id="Function-582"><a href="#Function-582"><span class="linenos">582</span></a><span class="sd">        certain eligible functions can admit different visualisations, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as</span>
 </span><span id="Function-583"><a href="#Function-583"><span class="linenos">583</span></a><span class="sd">        a surface or as a set of level curves.</span>
 </span><span id="Function-584"><a href="#Function-584"><span class="linenos">584</span></a>
 </span><span id="Function-585"><a href="#Function-585"><span class="linenos">585</span></a><span class="sd">        For these reasons, the method `plot` needs a classification provided by the argement `plot_classification`, which takes the strings '2d' or '3d'</span>
@@ -1635,11 +1693,11 @@ curl is a separate method (<code>curl3d</code>) to come.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Function.plot-575"><a href="#Function.plot-575"><span class="linenos">575</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_classification</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 </span><span id="Function.plot-576"><a href="#Function.plot-576"><span class="linenos">576</span></a><span class="w">        </span><span class="sd">"""</span>
 </span><span id="Function.plot-577"><a href="#Function.plot-577"><span class="linenos">577</span></a><span class="sd">        Constructs the correct `Matplotlib` plot in memory if applicable, it is the responsability of the user to place it in a Canvas object for</span>
-</span><span id="Function.plot-578"><a href="#Function.plot-578"><span class="linenos">578</span></a><span class="sd">        display (cf. the `graphics` module).</span>
+</span><span id="Function.plot-578"><a href="#Function.plot-578"><span class="linenos">578</span></a><span class="sd">        plotting (cf. the `graphics` module).</span>
 </span><span id="Function.plot-579"><a href="#Function.plot-579"><span class="linenos">579</span></a>
 </span><span id="Function.plot-580"><a href="#Function.plot-580"><span class="linenos">580</span></a><span class="sd">        The call is highly context-sensitive, since by far not any function that can abstractly be handled by the class `Function` is eligible</span>
 </span><span id="Function.plot-581"><a href="#Function.plot-581"><span class="linenos">581</span></a><span class="sd">        for visualisation. Notice that this is an intrinsic limitation of human spatial senses, due to the way we evolved as species. Furthermore, </span>
-</span><span id="Function.plot-582"><a href="#Function.plot-582"><span class="linenos">582</span></a><span class="sd">        certain eligible functions can admit different visualtions, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as</span>
+</span><span id="Function.plot-582"><a href="#Function.plot-582"><span class="linenos">582</span></a><span class="sd">        certain eligible functions can admit different visualisations, for instance we can plot a function $\\mathbb{R}^2 \\rightarrow \\mathbb{R}$ as</span>
 </span><span id="Function.plot-583"><a href="#Function.plot-583"><span class="linenos">583</span></a><span class="sd">        a surface or as a set of level curves.</span>
 </span><span id="Function.plot-584"><a href="#Function.plot-584"><span class="linenos">584</span></a>
 </span><span id="Function.plot-585"><a href="#Function.plot-585"><span class="linenos">585</span></a><span class="sd">        For these reasons, the method `plot` needs a classification provided by the argement `plot_classification`, which takes the strings '2d' or '3d'</span>
@@ -1668,11 +1726,11 @@ curl is a separate method (<code>curl3d</code>) to come.</p>
 
 
             <div class="docstring"><p>Constructs the correct <code>Matplotlib</code> plot in memory if applicable, it is the responsability of the user to place it in a Canvas object for
-display (cf. the <code><a href="graphics.html">graphics</a></code> module).</p>
+plotting (cf. the <code><a href="graphics.html">graphics</a></code> module).</p>
 
 <p>The call is highly context-sensitive, since by far not any function that can abstractly be handled by the class <code><a href="#Function">Function</a></code> is eligible
 for visualisation. Notice that this is an intrinsic limitation of human spatial senses, due to the way we evolved as species. Furthermore, 
-certain eligible functions can admit different visualtions, for instance we can plot a function $\mathbb{R}^2 \rightarrow \mathbb{R}$ as
+certain eligible functions can admit different visualisations, for instance we can plot a function $\mathbb{R}^2 \rightarrow \mathbb{R}$ as
 a surface or as a set of level curves.</p>
 
 <p>For these reasons, the method <code><a href="#Function.plot">plot</a></code> needs a classification provided by the argement <code>plot_classification</code>, which takes the strings '2d' or '3d'
@@ -1773,6 +1831,698 @@ object is the last line of a code cell, otherwise it needs to be invoked it expl
 
 
                             </div>
+                </section>
+                <section id="Vector">
+                            <input id="Vector-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">Vector</span>:
+
+                <label class="view-source-button" for="Vector-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector-97"><a href="#Vector-97"><span class="linenos"> 97</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Vector</span><span class="p">:</span>
+</span><span id="Vector-98"><a href="#Vector-98"><span class="linenos"> 98</span></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="Vector-99"><a href="#Vector-99"><span class="linenos"> 99</span></a><span class="sd">    An element of $\\mathbb{R}^n$, stored as a SymPy $n \\times 1$ column.</span>
+</span><span id="Vector-100"><a href="#Vector-100"><span class="linenos">100</span></a>
+</span><span id="Vector-101"><a href="#Vector-101"><span class="linenos">101</span></a><span class="sd">    A ``Vector`` may be added to another ``Vector``, scaled by a scalar, and</span>
+</span><span id="Vector-102"><a href="#Vector-102"><span class="linenos">102</span></a><span class="sd">    (in $n = 3$) crossed with another ``Vector``.  It has **no position**:</span>
+</span><span id="Vector-103"><a href="#Vector-103"><span class="linenos">103</span></a><span class="sd">    to place it in space, use :meth:`plot` with an ``origin``, or</span>
+</span><span id="Vector-104"><a href="#Vector-104"><span class="linenos">104</span></a><span class="sd">    :meth:`to_point`.</span>
+</span><span id="Vector-105"><a href="#Vector-105"><span class="linenos">105</span></a>
+</span><span id="Vector-106"><a href="#Vector-106"><span class="linenos">106</span></a><span class="sd">    Examples</span>
+</span><span id="Vector-107"><a href="#Vector-107"><span class="linenos">107</span></a><span class="sd">    --------</span>
+</span><span id="Vector-108"><a href="#Vector-108"><span class="linenos">108</span></a><span class="sd">    &gt;&gt;&gt; v = Vector([3, 4])</span>
+</span><span id="Vector-109"><a href="#Vector-109"><span class="linenos">109</span></a><span class="sd">    &gt;&gt;&gt; v.norm()</span>
+</span><span id="Vector-110"><a href="#Vector-110"><span class="linenos">110</span></a><span class="sd">    5</span>
+</span><span id="Vector-111"><a href="#Vector-111"><span class="linenos">111</span></a><span class="sd">    &gt;&gt;&gt; Vector([1, 0, 0]).cross(Vector([0, 1, 0]))</span>
+</span><span id="Vector-112"><a href="#Vector-112"><span class="linenos">112</span></a><span class="sd">    Vector([0, 1, 0])</span>
+</span><span id="Vector-113"><a href="#Vector-113"><span class="linenos">113</span></a><span class="sd">    """</span>
+</span><span id="Vector-114"><a href="#Vector-114"><span class="linenos">114</span></a>
+</span><span id="Vector-115"><a href="#Vector-115"><span class="linenos">115</span></a>    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_m"</span><span class="p">,)</span>
+</span><span id="Vector-116"><a href="#Vector-116"><span class="linenos">116</span></a>
+</span><span id="Vector-117"><a href="#Vector-117"><span class="linenos">117</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
+</span><span id="Vector-118"><a href="#Vector-118"><span class="linenos">118</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="n">_as_column</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+</span><span id="Vector-119"><a href="#Vector-119"><span class="linenos">119</span></a>
+</span><span id="Vector-120"><a href="#Vector-120"><span class="linenos">120</span></a>    <span class="c1"># -- basic accessors --------------------------------------------------</span>
+</span><span id="Vector-121"><a href="#Vector-121"><span class="linenos">121</span></a>
+</span><span id="Vector-122"><a href="#Vector-122"><span class="linenos">122</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="Vector-123"><a href="#Vector-123"><span class="linenos">123</span></a><span class="w">        </span><span class="sd">"""Dimension $n$ of the ambient space."""</span>
+</span><span id="Vector-124"><a href="#Vector-124"><span class="linenos">124</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="o">.</span><span class="n">rows</span>
+</span><span id="Vector-125"><a href="#Vector-125"><span class="linenos">125</span></a>
+</span><span id="Vector-126"><a href="#Vector-126"><span class="linenos">126</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Vector-127"><a href="#Vector-127"><span class="linenos">127</span></a><span class="w">        </span><span class="sd">"""The entries as a tuple of SymPy expressions."""</span>
+</span><span id="Vector-128"><a href="#Vector-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()))</span>
+</span><span id="Vector-129"><a href="#Vector-129"><span class="linenos">129</span></a>
+</span><span id="Vector-130"><a href="#Vector-130"><span class="linenos">130</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">as_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImmutableMatrix</span><span class="p">:</span>
+</span><span id="Vector-131"><a href="#Vector-131"><span class="linenos">131</span></a><span class="w">        </span><span class="sd">"""The underlying $n \\times 1$ SymPy column matrix."""</span>
+</span><span id="Vector-132"><a href="#Vector-132"><span class="linenos">132</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span>
+</span><span id="Vector-133"><a href="#Vector-133"><span class="linenos">133</span></a>
+</span><span id="Vector-134"><a href="#Vector-134"><span class="linenos">134</span></a>    <span class="c1"># -- arithmetic -------------------------------------------------------</span>
+</span><span id="Vector-135"><a href="#Vector-135"><span class="linenos">135</span></a>
+</span><span id="Vector-136"><a href="#Vector-136"><span class="linenos">136</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_same_dom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+</span><span id="Vector-137"><a href="#Vector-137"><span class="linenos">137</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+</span><span id="Vector-138"><a href="#Vector-138"><span class="linenos">138</span></a>            <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Vector-139"><a href="#Vector-139"><span class="linenos">139</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">():</span>
+</span><span id="Vector-140"><a href="#Vector-140"><span class="linenos">140</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="Vector-141"><a href="#Vector-141"><span class="linenos">141</span></a>                <span class="sa">f</span><span class="s2">"cannot </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2"> vectors of dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="Vector-142"><a href="#Vector-142"><span class="linenos">142</span></a>            <span class="p">)</span>
+</span><span id="Vector-143"><a href="#Vector-143"><span class="linenos">143</span></a>        <span class="k">return</span> <span class="n">other</span>
+</span><span id="Vector-144"><a href="#Vector-144"><span class="linenos">144</span></a>
+</span><span id="Vector-145"><a href="#Vector-145"><span class="linenos">145</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Vector-146"><a href="#Vector-146"><span class="linenos">146</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_same_dom</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+</span><span id="Vector-147"><a href="#Vector-147"><span class="linenos">147</span></a>            <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Vector-148"><a href="#Vector-148"><span class="linenos">148</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Vector-149"><a href="#Vector-149"><span class="linenos">149</span></a>
+</span><span id="Vector-150"><a href="#Vector-150"><span class="linenos">150</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Vector-151"><a href="#Vector-151"><span class="linenos">151</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span id="Vector-152"><a href="#Vector-152"><span class="linenos">152</span></a>
+</span><span id="Vector-153"><a href="#Vector-153"><span class="linenos">153</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Vector-154"><a href="#Vector-154"><span class="linenos">154</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_same_dom</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"subtract"</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+</span><span id="Vector-155"><a href="#Vector-155"><span class="linenos">155</span></a>            <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Vector-156"><a href="#Vector-156"><span class="linenos">156</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Vector-157"><a href="#Vector-157"><span class="linenos">157</span></a>
+</span><span id="Vector-158"><a href="#Vector-158"><span class="linenos">158</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Vector-159"><a href="#Vector-159"><span class="linenos">159</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Vector-160"><a href="#Vector-160"><span class="linenos">160</span></a>
+</span><span id="Vector-161"><a href="#Vector-161"><span class="linenos">161</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+</span><span id="Vector-162"><a href="#Vector-162"><span class="linenos">162</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+</span><span id="Vector-163"><a href="#Vector-163"><span class="linenos">163</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+</span><span id="Vector-164"><a href="#Vector-164"><span class="linenos">164</span></a>                <span class="s2">"Vector * Vector is ambiguous; use .dot(w) or .cross(w)."</span>
+</span><span id="Vector-165"><a href="#Vector-165"><span class="linenos">165</span></a>            <span class="p">)</span>
+</span><span id="Vector-166"><a href="#Vector-166"><span class="linenos">166</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Point</span><span class="p">):</span>
+</span><span id="Vector-167"><a href="#Vector-167"><span class="linenos">167</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+</span><span id="Vector-168"><a href="#Vector-168"><span class="linenos">168</span></a>                <span class="s2">"cannot multiply a vector by a point; "</span>
+</span><span id="Vector-169"><a href="#Vector-169"><span class="linenos">169</span></a>                <span class="s2">"did you mean .dot(p.to_vector())?"</span>
+</span><span id="Vector-170"><a href="#Vector-170"><span class="linenos">170</span></a>            <span class="p">)</span>
+</span><span id="Vector-171"><a href="#Vector-171"><span class="linenos">171</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">*</span> <span class="n">sympify</span><span class="p">(</span><span class="n">scalar</span><span class="p">))</span>
+</span><span id="Vector-172"><a href="#Vector-172"><span class="linenos">172</span></a>
+</span><span id="Vector-173"><a href="#Vector-173"><span class="linenos">173</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+</span><span id="Vector-174"><a href="#Vector-174"><span class="linenos">174</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span>
+</span><span id="Vector-175"><a href="#Vector-175"><span class="linenos">175</span></a>
+</span><span id="Vector-176"><a href="#Vector-176"><span class="linenos">176</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+</span><span id="Vector-177"><a href="#Vector-177"><span class="linenos">177</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="p">(</span><span class="n">Vector</span><span class="p">,</span> <span class="n">Point</span><span class="p">)):</span>
+</span><span id="Vector-178"><a href="#Vector-178"><span class="linenos">178</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Vector / Vector is undefined."</span><span class="p">)</span>
+</span><span id="Vector-179"><a href="#Vector-179"><span class="linenos">179</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">/</span> <span class="n">sympify</span><span class="p">(</span><span class="n">scalar</span><span class="p">))</span>
+</span><span id="Vector-180"><a href="#Vector-180"><span class="linenos">180</span></a>
+</span><span id="Vector-181"><a href="#Vector-181"><span class="linenos">181</span></a>    <span class="c1"># -- inner products ---------------------------------------------------</span>
+</span><span id="Vector-182"><a href="#Vector-182"><span class="linenos">182</span></a>
+</span><span id="Vector-183"><a href="#Vector-183"><span class="linenos">183</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span><span class="p">:</span>
+</span><span id="Vector-184"><a href="#Vector-184"><span class="linenos">184</span></a><span class="w">        </span><span class="sd">"""Euclidean scalar product $v \\cdot w$ (returns a SymPy expression)."""</span>
+</span><span id="Vector-185"><a href="#Vector-185"><span class="linenos">185</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_same_dom</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"dot"</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+</span><span id="Vector-186"><a href="#Vector-186"><span class="linenos">186</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"dot product requires another Vector of the same dimension"</span><span class="p">)</span>
+</span><span id="Vector-187"><a href="#Vector-187"><span class="linenos">187</span></a>        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span><span id="Vector-188"><a href="#Vector-188"><span class="linenos">188</span></a>
+</span><span id="Vector-189"><a href="#Vector-189"><span class="linenos">189</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span><span class="p">:</span>
+</span><span id="Vector-190"><a href="#Vector-190"><span class="linenos">190</span></a><span class="w">        </span><span class="sd">"""Euclidean norm $\\sqrt{v \\cdot v}$ -- symbolic when the entries are."""</span>
+</span><span id="Vector-191"><a href="#Vector-191"><span class="linenos">191</span></a>        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</span><span id="Vector-192"><a href="#Vector-192"><span class="linenos">192</span></a>
+</span><span id="Vector-193"><a href="#Vector-193"><span class="linenos">193</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">cross</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Vector"</span><span class="p">:</span>
+</span><span id="Vector-194"><a href="#Vector-194"><span class="linenos">194</span></a><span class="w">        </span><span class="sd">"""Cross product, defined only for $n = 3$."""</span>
+</span><span id="Vector-195"><a href="#Vector-195"><span class="linenos">195</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+</span><span id="Vector-196"><a href="#Vector-196"><span class="linenos">196</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="Vector-197"><a href="#Vector-197"><span class="linenos">197</span></a>                <span class="sa">f</span><span class="s2">"cross product is defined only in dimension 3, not </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="Vector-198"><a href="#Vector-198"><span class="linenos">198</span></a>            <span class="p">)</span>
+</span><span id="Vector-199"><a href="#Vector-199"><span class="linenos">199</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_same_dom</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"cross"</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+</span><span id="Vector-200"><a href="#Vector-200"><span class="linenos">200</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"cross product requires another Vector of the same dimension"</span><span class="p">)</span>
+</span><span id="Vector-201"><a href="#Vector-201"><span class="linenos">201</span></a>        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span>
+</span><span id="Vector-202"><a href="#Vector-202"><span class="linenos">202</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">([</span>
+</span><span id="Vector-203"><a href="#Vector-203"><span class="linenos">203</span></a>            <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span id="Vector-204"><a href="#Vector-204"><span class="linenos">204</span></a>            <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span id="Vector-205"><a href="#Vector-205"><span class="linenos">205</span></a>            <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span id="Vector-206"><a href="#Vector-206"><span class="linenos">206</span></a>        <span class="p">])</span>
+</span><span id="Vector-207"><a href="#Vector-207"><span class="linenos">207</span></a>
+</span><span id="Vector-208"><a href="#Vector-208"><span class="linenos">208</span></a>    <span class="c1"># -- conversion -------------------------------------------------------</span>
+</span><span id="Vector-209"><a href="#Vector-209"><span class="linenos">209</span></a>
+</span><span id="Vector-210"><a href="#Vector-210"><span class="linenos">210</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Point"</span><span class="p">:</span>
+</span><span id="Vector-211"><a href="#Vector-211"><span class="linenos">211</span></a><span class="w">        </span><span class="sd">"""The point $O + v$ (representative at the fixed origin $O$)."""</span>
+</span><span id="Vector-212"><a href="#Vector-212"><span class="linenos">212</span></a>        <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Vector-213"><a href="#Vector-213"><span class="linenos">213</span></a>
+</span><span id="Vector-214"><a href="#Vector-214"><span class="linenos">214</span></a>    <span class="c1"># -- display ----------------------------------------------------------</span>
+</span><span id="Vector-215"><a href="#Vector-215"><span class="linenos">215</span></a>
+</span><span id="Vector-216"><a href="#Vector-216"><span class="linenos">216</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Vector-217"><a href="#Vector-217"><span class="linenos">217</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Vector(</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">())</span><span class="si">!r}</span><span class="s2">)"</span>
+</span><span id="Vector-218"><a href="#Vector-218"><span class="linenos">218</span></a>
+</span><span id="Vector-219"><a href="#Vector-219"><span class="linenos">219</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_latex_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Vector-220"><a href="#Vector-220"><span class="linenos">220</span></a>        <span class="c1"># SymPy's latex() already emits a bmatrix for a column.</span>
+</span><span id="Vector-221"><a href="#Vector-221"><span class="linenos">221</span></a>        <span class="k">return</span> <span class="n">latex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Vector-222"><a href="#Vector-222"><span class="linenos">222</span></a>
+</span><span id="Vector-223"><a href="#Vector-223"><span class="linenos">223</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Vector-224"><a href="#Vector-224"><span class="linenos">224</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+</span><span id="Vector-225"><a href="#Vector-225"><span class="linenos">225</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span>
+</span><span id="Vector-226"><a href="#Vector-226"><span class="linenos">226</span></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Vector-227"><a href="#Vector-227"><span class="linenos">227</span></a>
+</span><span id="Vector-228"><a href="#Vector-228"><span class="linenos">228</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Vector-229"><a href="#Vector-229"><span class="linenos">229</span></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">"Vector"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">))</span>
+</span><span id="Vector-230"><a href="#Vector-230"><span class="linenos">230</span></a>
+</span><span id="Vector-231"><a href="#Vector-231"><span class="linenos">231</span></a>    <span class="c1"># -- plotting ---------------------------------------------------------</span>
+</span><span id="Vector-232"><a href="#Vector-232"><span class="linenos">232</span></a>
+</span><span id="Vector-233"><a href="#Vector-233"><span class="linenos">233</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Vector-234"><a href="#Vector-234"><span class="linenos">234</span></a><span class="w">        </span><span class="sd">"""Draw this vector as an arrow.</span>
+</span><span id="Vector-235"><a href="#Vector-235"><span class="linenos">235</span></a>
+</span><span id="Vector-236"><a href="#Vector-236"><span class="linenos">236</span></a><span class="sd">        Parameters</span>
+</span><span id="Vector-237"><a href="#Vector-237"><span class="linenos">237</span></a><span class="sd">        ----------</span>
+</span><span id="Vector-238"><a href="#Vector-238"><span class="linenos">238</span></a><span class="sd">        origin : Vector or Point or list, optional</span>
+</span><span id="Vector-239"><a href="#Vector-239"><span class="linenos">239</span></a><span class="sd">            Tail of the arrow.  Defaults to the origin ``O`` (coordinates zero).</span>
+</span><span id="Vector-240"><a href="#Vector-240"><span class="linenos">240</span></a><span class="sd">            Pass a ``Point`` to draw the vector *at* that point -- affine</span>
+</span><span id="Vector-241"><a href="#Vector-241"><span class="linenos">241</span></a><span class="sd">            geometry in action.</span>
+</span><span id="Vector-242"><a href="#Vector-242"><span class="linenos">242</span></a><span class="sd">        canvas, panel, color, label :</span>
+</span><span id="Vector-243"><a href="#Vector-243"><span class="linenos">243</span></a><span class="sd">            Forwarded to the registered builder (see ``funlib.graphics``).</span>
+</span><span id="Vector-244"><a href="#Vector-244"><span class="linenos">244</span></a><span class="sd">        """</span>
+</span><span id="Vector-245"><a href="#Vector-245"><span class="linenos">245</span></a>        <span class="n">builder</span> <span class="o">=</span> <span class="n">_require_plot</span><span class="p">(</span><span class="n">Vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">())</span>
+</span><span id="Vector-246"><a href="#Vector-246"><span class="linenos">246</span></a>        <span class="k">return</span> <span class="n">builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="n">panel</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+</span><span id="Vector-247"><a href="#Vector-247"><span class="linenos">247</span></a>                       <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>An element of $\mathbb{R}^n$, stored as a SymPy $n \times 1$ column.</p>
+
+<p>A <code><a href="#Vector">Vector</a></code> may be added to another <code><a href="#Vector">Vector</a></code>, scaled by a scalar, and
+(in $n = 3$) crossed with another <code><a href="#Vector">Vector</a></code>.  It has <strong>no position</strong>:
+to place it in space, use <code><a href="#Vector.plot">plot()</a></code> with an <code>origin</code>, or
+<code><a href="#Vector.to_point">to_point()</a></code>.</p>
+
+<h2 id="examples">Examples</h2>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Vector</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">Vector</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+<span class="go">Vector([0, 1, 0])</span>
+</code></pre>
+</div>
+</div>
+
+
+                            <div id="Vector.__init__" class="classattr">
+                                        <input id="Vector.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">Vector</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">entries</span></span>)</span>
+
+                <label class="view-source-button" for="Vector.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.__init__-117"><a href="#Vector.__init__-117"><span class="linenos">117</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
+</span><span id="Vector.__init__-118"><a href="#Vector.__init__-118"><span class="linenos">118</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="n">_as_column</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="Vector.dom" class="classattr">
+                                        <input id="Vector.dom-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">dom</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="Vector.dom-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.dom"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.dom-122"><a href="#Vector.dom-122"><span class="linenos">122</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="Vector.dom-123"><a href="#Vector.dom-123"><span class="linenos">123</span></a><span class="w">        </span><span class="sd">"""Dimension $n$ of the ambient space."""</span>
+</span><span id="Vector.dom-124"><a href="#Vector.dom-124"><span class="linenos">124</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="o">.</span><span class="n">rows</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Dimension $n$ of the ambient space.</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.entries" class="classattr">
+                                        <input id="Vector.entries-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">entries</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Vector.entries-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.entries"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.entries-126"><a href="#Vector.entries-126"><span class="linenos">126</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Vector.entries-127"><a href="#Vector.entries-127"><span class="linenos">127</span></a><span class="w">        </span><span class="sd">"""The entries as a tuple of SymPy expressions."""</span>
+</span><span id="Vector.entries-128"><a href="#Vector.entries-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()))</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>The entries as a tuple of SymPy expressions.</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.as_matrix" class="classattr">
+                                        <input id="Vector.as_matrix-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">as_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">sympy</span><span class="o">.</span><span class="n">matrices</span><span class="o">.</span><span class="n">immutable</span><span class="o">.</span><span class="n">ImmutableDenseMatrix</span>:</span></span>
+
+                <label class="view-source-button" for="Vector.as_matrix-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.as_matrix"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.as_matrix-130"><a href="#Vector.as_matrix-130"><span class="linenos">130</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">as_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImmutableMatrix</span><span class="p">:</span>
+</span><span id="Vector.as_matrix-131"><a href="#Vector.as_matrix-131"><span class="linenos">131</span></a><span class="w">        </span><span class="sd">"""The underlying $n \\times 1$ SymPy column matrix."""</span>
+</span><span id="Vector.as_matrix-132"><a href="#Vector.as_matrix-132"><span class="linenos">132</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>The underlying $n \times 1$ SymPy column matrix.</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.dot" class="classattr">
+                                        <input id="Vector.dot-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">dot</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">other</span></span><span class="return-annotation">) -> <span class="n">sympy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">Expr</span>:</span></span>
+
+                <label class="view-source-button" for="Vector.dot-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.dot"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.dot-183"><a href="#Vector.dot-183"><span class="linenos">183</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span><span class="p">:</span>
+</span><span id="Vector.dot-184"><a href="#Vector.dot-184"><span class="linenos">184</span></a><span class="w">        </span><span class="sd">"""Euclidean scalar product $v \\cdot w$ (returns a SymPy expression)."""</span>
+</span><span id="Vector.dot-185"><a href="#Vector.dot-185"><span class="linenos">185</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_same_dom</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"dot"</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+</span><span id="Vector.dot-186"><a href="#Vector.dot-186"><span class="linenos">186</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"dot product requires another Vector of the same dimension"</span><span class="p">)</span>
+</span><span id="Vector.dot-187"><a href="#Vector.dot-187"><span class="linenos">187</span></a>        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">expand</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Euclidean scalar product $v \cdot w$ (returns a SymPy expression).</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.norm" class="classattr">
+                                        <input id="Vector.norm-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">norm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">sympy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">Expr</span>:</span></span>
+
+                <label class="view-source-button" for="Vector.norm-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.norm"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.norm-189"><a href="#Vector.norm-189"><span class="linenos">189</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span><span class="p">:</span>
+</span><span id="Vector.norm-190"><a href="#Vector.norm-190"><span class="linenos">190</span></a><span class="w">        </span><span class="sd">"""Euclidean norm $\\sqrt{v \\cdot v}$ -- symbolic when the entries are."""</span>
+</span><span id="Vector.norm-191"><a href="#Vector.norm-191"><span class="linenos">191</span></a>        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Euclidean norm $\sqrt{v \cdot v}$ -- symbolic when the entries are.</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.cross" class="classattr">
+                                        <input id="Vector.cross-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">cross</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">other</span></span><span class="return-annotation">) -> <span class="n"><a href="#Vector">Vector</a></span>:</span></span>
+
+                <label class="view-source-button" for="Vector.cross-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.cross"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.cross-193"><a href="#Vector.cross-193"><span class="linenos">193</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">cross</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Vector"</span><span class="p">:</span>
+</span><span id="Vector.cross-194"><a href="#Vector.cross-194"><span class="linenos">194</span></a><span class="w">        </span><span class="sd">"""Cross product, defined only for $n = 3$."""</span>
+</span><span id="Vector.cross-195"><a href="#Vector.cross-195"><span class="linenos">195</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+</span><span id="Vector.cross-196"><a href="#Vector.cross-196"><span class="linenos">196</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="Vector.cross-197"><a href="#Vector.cross-197"><span class="linenos">197</span></a>                <span class="sa">f</span><span class="s2">"cross product is defined only in dimension 3, not </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="Vector.cross-198"><a href="#Vector.cross-198"><span class="linenos">198</span></a>            <span class="p">)</span>
+</span><span id="Vector.cross-199"><a href="#Vector.cross-199"><span class="linenos">199</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_same_dom</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"cross"</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+</span><span id="Vector.cross-200"><a href="#Vector.cross-200"><span class="linenos">200</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"cross product requires another Vector of the same dimension"</span><span class="p">)</span>
+</span><span id="Vector.cross-201"><a href="#Vector.cross-201"><span class="linenos">201</span></a>        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span>
+</span><span id="Vector.cross-202"><a href="#Vector.cross-202"><span class="linenos">202</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">([</span>
+</span><span id="Vector.cross-203"><a href="#Vector.cross-203"><span class="linenos">203</span></a>            <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span id="Vector.cross-204"><a href="#Vector.cross-204"><span class="linenos">204</span></a>            <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span id="Vector.cross-205"><a href="#Vector.cross-205"><span class="linenos">205</span></a>            <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span id="Vector.cross-206"><a href="#Vector.cross-206"><span class="linenos">206</span></a>        <span class="p">])</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Cross product, defined only for $n = 3$.</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.to_point" class="classattr">
+                                        <input id="Vector.to_point-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">to_point</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n"><a href="#Point">Point</a></span>:</span></span>
+
+                <label class="view-source-button" for="Vector.to_point-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.to_point"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.to_point-210"><a href="#Vector.to_point-210"><span class="linenos">210</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Point"</span><span class="p">:</span>
+</span><span id="Vector.to_point-211"><a href="#Vector.to_point-211"><span class="linenos">211</span></a><span class="w">        </span><span class="sd">"""The point $O + v$ (representative at the fixed origin $O$)."""</span>
+</span><span id="Vector.to_point-212"><a href="#Vector.to_point-212"><span class="linenos">212</span></a>        <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>The point $O + v$ (representative at the fixed origin $O$).</p>
+</div>
+
+
+                            </div>
+                            <div id="Vector.plot" class="classattr">
+                                        <input id="Vector.plot-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">plot</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">canvas</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">panel</span><span class="o">=</span><span class="mi">0</span>, </span><span class="param"><span class="n">origin</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">color</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">label</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Vector.plot-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Vector.plot"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Vector.plot-233"><a href="#Vector.plot-233"><span class="linenos">233</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Vector.plot-234"><a href="#Vector.plot-234"><span class="linenos">234</span></a><span class="w">        </span><span class="sd">"""Draw this vector as an arrow.</span>
+</span><span id="Vector.plot-235"><a href="#Vector.plot-235"><span class="linenos">235</span></a>
+</span><span id="Vector.plot-236"><a href="#Vector.plot-236"><span class="linenos">236</span></a><span class="sd">        Parameters</span>
+</span><span id="Vector.plot-237"><a href="#Vector.plot-237"><span class="linenos">237</span></a><span class="sd">        ----------</span>
+</span><span id="Vector.plot-238"><a href="#Vector.plot-238"><span class="linenos">238</span></a><span class="sd">        origin : Vector or Point or list, optional</span>
+</span><span id="Vector.plot-239"><a href="#Vector.plot-239"><span class="linenos">239</span></a><span class="sd">            Tail of the arrow.  Defaults to the origin ``O`` (coordinates zero).</span>
+</span><span id="Vector.plot-240"><a href="#Vector.plot-240"><span class="linenos">240</span></a><span class="sd">            Pass a ``Point`` to draw the vector *at* that point -- affine</span>
+</span><span id="Vector.plot-241"><a href="#Vector.plot-241"><span class="linenos">241</span></a><span class="sd">            geometry in action.</span>
+</span><span id="Vector.plot-242"><a href="#Vector.plot-242"><span class="linenos">242</span></a><span class="sd">        canvas, panel, color, label :</span>
+</span><span id="Vector.plot-243"><a href="#Vector.plot-243"><span class="linenos">243</span></a><span class="sd">            Forwarded to the registered builder (see ``funlib.graphics``).</span>
+</span><span id="Vector.plot-244"><a href="#Vector.plot-244"><span class="linenos">244</span></a><span class="sd">        """</span>
+</span><span id="Vector.plot-245"><a href="#Vector.plot-245"><span class="linenos">245</span></a>        <span class="n">builder</span> <span class="o">=</span> <span class="n">_require_plot</span><span class="p">(</span><span class="n">Vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">())</span>
+</span><span id="Vector.plot-246"><a href="#Vector.plot-246"><span class="linenos">246</span></a>        <span class="k">return</span> <span class="n">builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="n">panel</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+</span><span id="Vector.plot-247"><a href="#Vector.plot-247"><span class="linenos">247</span></a>                       <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Draw this vector as an arrow.</p>
+
+<h2 id="parameters">Parameters</h2>
+
+<p>origin : Vector or Point or list, optional
+    Tail of the arrow.  Defaults to the origin <code>O</code> (coordinates zero).
+    Pass a <code><a href="#Point">Point</a></code> to draw the vector <em>at</em> that point -- affine
+    geometry in action.
+canvas, panel, color, label :
+    Forwarded to the registered builder (see <code>funlib.graphics</code>).</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="Point">
+                            <input id="Point-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">Point</span>:
+
+                <label class="view-source-button" for="Point-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Point"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Point-254"><a href="#Point-254"><span class="linenos">254</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Point</span><span class="p">:</span>
+</span><span id="Point-255"><a href="#Point-255"><span class="linenos">255</span></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="Point-256"><a href="#Point-256"><span class="linenos">256</span></a><span class="sd">    An element of affine $n$-space, stored as a SymPy $n \\times 1$ column.</span>
+</span><span id="Point-257"><a href="#Point-257"><span class="linenos">257</span></a>
+</span><span id="Point-258"><a href="#Point-258"><span class="linenos">258</span></a><span class="sd">    A point has a *position*.  You may translate it by a vector ($p + v$),</span>
+</span><span id="Point-259"><a href="#Point-259"><span class="linenos">259</span></a><span class="sd">    and take the difference of two points to get a vector ($p - q$), but</span>
+</span><span id="Point-260"><a href="#Point-260"><span class="linenos">260</span></a><span class="sd">    adding two points is **not defined** -- this is the defining feature of</span>
+</span><span id="Point-261"><a href="#Point-261"><span class="linenos">261</span></a><span class="sd">    affine space, not an oversight.</span>
+</span><span id="Point-262"><a href="#Point-262"><span class="linenos">262</span></a>
+</span><span id="Point-263"><a href="#Point-263"><span class="linenos">263</span></a><span class="sd">    Examples</span>
+</span><span id="Point-264"><a href="#Point-264"><span class="linenos">264</span></a><span class="sd">    --------</span>
+</span><span id="Point-265"><a href="#Point-265"><span class="linenos">265</span></a><span class="sd">    &gt;&gt;&gt; p, q = Point([1, 2]), Point([4, 6])</span>
+</span><span id="Point-266"><a href="#Point-266"><span class="linenos">266</span></a><span class="sd">    &gt;&gt;&gt; q - p</span>
+</span><span id="Point-267"><a href="#Point-267"><span class="linenos">267</span></a><span class="sd">    Vector([3, 4])</span>
+</span><span id="Point-268"><a href="#Point-268"><span class="linenos">268</span></a><span class="sd">    &gt;&gt;&gt; p + Vector([1, 1])</span>
+</span><span id="Point-269"><a href="#Point-269"><span class="linenos">269</span></a><span class="sd">    Point([2, 3])</span>
+</span><span id="Point-270"><a href="#Point-270"><span class="linenos">270</span></a><span class="sd">    """</span>
+</span><span id="Point-271"><a href="#Point-271"><span class="linenos">271</span></a>
+</span><span id="Point-272"><a href="#Point-272"><span class="linenos">272</span></a>    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"_m"</span><span class="p">,)</span>
+</span><span id="Point-273"><a href="#Point-273"><span class="linenos">273</span></a>
+</span><span id="Point-274"><a href="#Point-274"><span class="linenos">274</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+</span><span id="Point-275"><a href="#Point-275"><span class="linenos">275</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="n">_as_column</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+</span><span id="Point-276"><a href="#Point-276"><span class="linenos">276</span></a>
+</span><span id="Point-277"><a href="#Point-277"><span class="linenos">277</span></a>    <span class="c1"># -- basic accessors --------------------------------------------------</span>
+</span><span id="Point-278"><a href="#Point-278"><span class="linenos">278</span></a>
+</span><span id="Point-279"><a href="#Point-279"><span class="linenos">279</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="Point-280"><a href="#Point-280"><span class="linenos">280</span></a><span class="w">        </span><span class="sd">"""Dimension $n$ of the ambient space."""</span>
+</span><span id="Point-281"><a href="#Point-281"><span class="linenos">281</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="o">.</span><span class="n">rows</span>
+</span><span id="Point-282"><a href="#Point-282"><span class="linenos">282</span></a>
+</span><span id="Point-283"><a href="#Point-283"><span class="linenos">283</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Point-284"><a href="#Point-284"><span class="linenos">284</span></a><span class="w">        </span><span class="sd">"""The coordinates as a tuple of SymPy expressions."""</span>
+</span><span id="Point-285"><a href="#Point-285"><span class="linenos">285</span></a>        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()))</span>
+</span><span id="Point-286"><a href="#Point-286"><span class="linenos">286</span></a>
+</span><span id="Point-287"><a href="#Point-287"><span class="linenos">287</span></a>    <span class="c1"># -- affine arithmetic ------------------------------------------------</span>
+</span><span id="Point-288"><a href="#Point-288"><span class="linenos">288</span></a>
+</span><span id="Point-289"><a href="#Point-289"><span class="linenos">289</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Point-290"><a href="#Point-290"><span class="linenos">290</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+</span><span id="Point-291"><a href="#Point-291"><span class="linenos">291</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">():</span>
+</span><span id="Point-292"><a href="#Point-292"><span class="linenos">292</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="Point-293"><a href="#Point-293"><span class="linenos">293</span></a>                    <span class="sa">f</span><span class="s2">"cannot translate a point in dimension </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="Point-294"><a href="#Point-294"><span class="linenos">294</span></a>                    <span class="sa">f</span><span class="s2">"by a vector in dimension </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="Point-295"><a href="#Point-295"><span class="linenos">295</span></a>                <span class="p">)</span>
+</span><span id="Point-296"><a href="#Point-296"><span class="linenos">296</span></a>            <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Point-297"><a href="#Point-297"><span class="linenos">297</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Point</span><span class="p">):</span>
+</span><span id="Point-298"><a href="#Point-298"><span class="linenos">298</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+</span><span id="Point-299"><a href="#Point-299"><span class="linenos">299</span></a>                <span class="s2">"adding two points is undefined in affine geometry; "</span>
+</span><span id="Point-300"><a href="#Point-300"><span class="linenos">300</span></a>                <span class="s2">"use q - p to get the vector between them."</span>
+</span><span id="Point-301"><a href="#Point-301"><span class="linenos">301</span></a>            <span class="p">)</span>
+</span><span id="Point-302"><a href="#Point-302"><span class="linenos">302</span></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Point-303"><a href="#Point-303"><span class="linenos">303</span></a>
+</span><span id="Point-304"><a href="#Point-304"><span class="linenos">304</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Point-305"><a href="#Point-305"><span class="linenos">305</span></a>        <span class="c1"># v + p  ==  p + v</span>
+</span><span id="Point-306"><a href="#Point-306"><span class="linenos">306</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+</span><span id="Point-307"><a href="#Point-307"><span class="linenos">307</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span id="Point-308"><a href="#Point-308"><span class="linenos">308</span></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Point-309"><a href="#Point-309"><span class="linenos">309</span></a>
+</span><span id="Point-310"><a href="#Point-310"><span class="linenos">310</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Point-311"><a href="#Point-311"><span class="linenos">311</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Point</span><span class="p">):</span>
+</span><span id="Point-312"><a href="#Point-312"><span class="linenos">312</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">():</span>
+</span><span id="Point-313"><a href="#Point-313"><span class="linenos">313</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="Point-314"><a href="#Point-314"><span class="linenos">314</span></a>                    <span class="sa">f</span><span class="s2">"cannot subtract points in dimensions "</span>
+</span><span id="Point-315"><a href="#Point-315"><span class="linenos">315</span></a>                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="Point-316"><a href="#Point-316"><span class="linenos">316</span></a>                <span class="p">)</span>
+</span><span id="Point-317"><a href="#Point-317"><span class="linenos">317</span></a>            <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Point-318"><a href="#Point-318"><span class="linenos">318</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+</span><span id="Point-319"><a href="#Point-319"><span class="linenos">319</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">():</span>
+</span><span id="Point-320"><a href="#Point-320"><span class="linenos">320</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="Point-321"><a href="#Point-321"><span class="linenos">321</span></a>                    <span class="sa">f</span><span class="s2">"cannot translate a point in dimension </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="Point-322"><a href="#Point-322"><span class="linenos">322</span></a>                    <span class="sa">f</span><span class="s2">"by a vector in dimension </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">dom</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="Point-323"><a href="#Point-323"><span class="linenos">323</span></a>                <span class="p">)</span>
+</span><span id="Point-324"><a href="#Point-324"><span class="linenos">324</span></a>            <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Point-325"><a href="#Point-325"><span class="linenos">325</span></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Point-326"><a href="#Point-326"><span class="linenos">326</span></a>
+</span><span id="Point-327"><a href="#Point-327"><span class="linenos">327</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+</span><span id="Point-328"><a href="#Point-328"><span class="linenos">328</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+</span><span id="Point-329"><a href="#Point-329"><span class="linenos">329</span></a>            <span class="s2">"scalar multiplication of a point is undefined in affine geometry."</span>
+</span><span id="Point-330"><a href="#Point-330"><span class="linenos">330</span></a>        <span class="p">)</span>
+</span><span id="Point-331"><a href="#Point-331"><span class="linenos">331</span></a>
+</span><span id="Point-332"><a href="#Point-332"><span class="linenos">332</span></a>    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+</span><span id="Point-333"><a href="#Point-333"><span class="linenos">333</span></a>
+</span><span id="Point-334"><a href="#Point-334"><span class="linenos">334</span></a>    <span class="c1"># -- conversion -------------------------------------------------------</span>
+</span><span id="Point-335"><a href="#Point-335"><span class="linenos">335</span></a>
+</span><span id="Point-336"><a href="#Point-336"><span class="linenos">336</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vector</span><span class="p">:</span>
+</span><span id="Point-337"><a href="#Point-337"><span class="linenos">337</span></a><span class="w">        </span><span class="sd">"""The vector from the origin $O$ to this point (depends on $O$!)."""</span>
+</span><span id="Point-338"><a href="#Point-338"><span class="linenos">338</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span><span id="Point-339"><a href="#Point-339"><span class="linenos">339</span></a>
+</span><span id="Point-340"><a href="#Point-340"><span class="linenos">340</span></a>    <span class="c1"># -- display ----------------------------------------------------------</span>
+</span><span id="Point-341"><a href="#Point-341"><span class="linenos">341</span></a>
+</span><span id="Point-342"><a href="#Point-342"><span class="linenos">342</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Point-343"><a href="#Point-343"><span class="linenos">343</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Point(</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">())</span><span class="si">!r}</span><span class="s2">)"</span>
+</span><span id="Point-344"><a href="#Point-344"><span class="linenos">344</span></a>
+</span><span id="Point-345"><a href="#Point-345"><span class="linenos">345</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_latex_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Point-346"><a href="#Point-346"><span class="linenos">346</span></a>        <span class="c1"># Horizontal, parentheses:  \left(1,\,2,\,3\right)</span>
+</span><span id="Point-347"><a href="#Point-347"><span class="linenos">347</span></a>        <span class="n">parts</span> <span class="o">=</span> <span class="s2">",</span><span class="se">\\</span><span class="s2">,"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">latex</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">())</span>
+</span><span id="Point-348"><a href="#Point-348"><span class="linenos">348</span></a>        <span class="k">return</span> <span class="sa">rf</span><span class="s2">"\left(</span><span class="si">{</span><span class="n">parts</span><span class="si">}</span><span class="s2">\right)"</span>
+</span><span id="Point-349"><a href="#Point-349"><span class="linenos">349</span></a>
+</span><span id="Point-350"><a href="#Point-350"><span class="linenos">350</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+</span><span id="Point-351"><a href="#Point-351"><span class="linenos">351</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Point</span><span class="p">):</span>
+</span><span id="Point-352"><a href="#Point-352"><span class="linenos">352</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_m</span>
+</span><span id="Point-353"><a href="#Point-353"><span class="linenos">353</span></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
+</span><span id="Point-354"><a href="#Point-354"><span class="linenos">354</span></a>
+</span><span id="Point-355"><a href="#Point-355"><span class="linenos">355</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Point-356"><a href="#Point-356"><span class="linenos">356</span></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">"Point"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">))</span>
+</span><span id="Point-357"><a href="#Point-357"><span class="linenos">357</span></a>
+</span><span id="Point-358"><a href="#Point-358"><span class="linenos">358</span></a>    <span class="c1"># -- plotting ---------------------------------------------------------</span>
+</span><span id="Point-359"><a href="#Point-359"><span class="linenos">359</span></a>
+</span><span id="Point-360"><a href="#Point-360"><span class="linenos">360</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Point-361"><a href="#Point-361"><span class="linenos">361</span></a><span class="w">        </span><span class="sd">"""Draw this point as a marker.</span>
+</span><span id="Point-362"><a href="#Point-362"><span class="linenos">362</span></a>
+</span><span id="Point-363"><a href="#Point-363"><span class="linenos">363</span></a><span class="sd">        ``origin`` is accepted for signature parity with :meth:`Vector.plot` and</span>
+</span><span id="Point-364"><a href="#Point-364"><span class="linenos">364</span></a><span class="sd">        is ignored (a point *is* its position).</span>
+</span><span id="Point-365"><a href="#Point-365"><span class="linenos">365</span></a><span class="sd">        """</span>
+</span><span id="Point-366"><a href="#Point-366"><span class="linenos">366</span></a>        <span class="n">builder</span> <span class="o">=</span> <span class="n">_require_plot</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">())</span>
+</span><span id="Point-367"><a href="#Point-367"><span class="linenos">367</span></a>        <span class="k">return</span> <span class="n">builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="n">panel</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+</span><span id="Point-368"><a href="#Point-368"><span class="linenos">368</span></a>                       <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>An element of affine $n$-space, stored as a SymPy $n \times 1$ column.</p>
+
+<p>A point has a <em>position</em>.  You may translate it by a vector ($p + v$),
+and take the difference of two points to get a vector ($p - q$), but
+adding two points is <strong>not defined</strong> -- this is the defining feature of
+affine space, not an oversight.</p>
+
+<h2 id="examples">Examples</h2>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">Point</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">Point</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">-</span> <span class="n">p</span>
+<span class="go">Vector([3, 4])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">+</span> <span class="n">Vector</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="go">Point([2, 3])</span>
+</code></pre>
+</div>
+</div>
+
+
+                            <div id="Point.__init__" class="classattr">
+                                        <input id="Point.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">Point</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">coords</span></span>)</span>
+
+                <label class="view-source-button" for="Point.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Point.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Point.__init__-274"><a href="#Point.__init__-274"><span class="linenos">274</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+</span><span id="Point.__init__-275"><a href="#Point.__init__-275"><span class="linenos">275</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="n">_as_column</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="Point.dom" class="classattr">
+                                        <input id="Point.dom-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">dom</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
+
+                <label class="view-source-button" for="Point.dom-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Point.dom"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Point.dom-279"><a href="#Point.dom-279"><span class="linenos">279</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="Point.dom-280"><a href="#Point.dom-280"><span class="linenos">280</span></a><span class="w">        </span><span class="sd">"""Dimension $n$ of the ambient space."""</span>
+</span><span id="Point.dom-281"><a href="#Point.dom-281"><span class="linenos">281</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="o">.</span><span class="n">rows</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Dimension $n$ of the ambient space.</p>
+</div>
+
+
+                            </div>
+                            <div id="Point.coords" class="classattr">
+                                        <input id="Point.coords-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">coords</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Point.coords-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Point.coords"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Point.coords-283"><a href="#Point.coords-283"><span class="linenos">283</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Point.coords-284"><a href="#Point.coords-284"><span class="linenos">284</span></a><span class="w">        </span><span class="sd">"""The coordinates as a tuple of SymPy expressions."""</span>
+</span><span id="Point.coords-285"><a href="#Point.coords-285"><span class="linenos">285</span></a>        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">()))</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>The coordinates as a tuple of SymPy expressions.</p>
+</div>
+
+
+                            </div>
+                            <div id="Point.to_vector" class="classattr">
+                                        <input id="Point.to_vector-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">to_vector</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n"><a href="#Vector">Vector</a></span>:</span></span>
+
+                <label class="view-source-button" for="Point.to_vector-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Point.to_vector"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Point.to_vector-336"><a href="#Point.to_vector-336"><span class="linenos">336</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vector</span><span class="p">:</span>
+</span><span id="Point.to_vector-337"><a href="#Point.to_vector-337"><span class="linenos">337</span></a><span class="w">        </span><span class="sd">"""The vector from the origin $O$ to this point (depends on $O$!)."""</span>
+</span><span id="Point.to_vector-338"><a href="#Point.to_vector-338"><span class="linenos">338</span></a>        <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>The vector from the origin $O$ to this point (depends on $O$!).</p>
+</div>
+
+
+                            </div>
+                            <div id="Point.plot" class="classattr">
+                                        <input id="Point.plot-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">plot</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">canvas</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">panel</span><span class="o">=</span><span class="mi">0</span>, </span><span class="param"><span class="n">origin</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">color</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">label</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Point.plot-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Point.plot"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Point.plot-360"><a href="#Point.plot-360"><span class="linenos">360</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Point.plot-361"><a href="#Point.plot-361"><span class="linenos">361</span></a><span class="w">        </span><span class="sd">"""Draw this point as a marker.</span>
+</span><span id="Point.plot-362"><a href="#Point.plot-362"><span class="linenos">362</span></a>
+</span><span id="Point.plot-363"><a href="#Point.plot-363"><span class="linenos">363</span></a><span class="sd">        ``origin`` is accepted for signature parity with :meth:`Vector.plot` and</span>
+</span><span id="Point.plot-364"><a href="#Point.plot-364"><span class="linenos">364</span></a><span class="sd">        is ignored (a point *is* its position).</span>
+</span><span id="Point.plot-365"><a href="#Point.plot-365"><span class="linenos">365</span></a><span class="sd">        """</span>
+</span><span id="Point.plot-366"><a href="#Point.plot-366"><span class="linenos">366</span></a>        <span class="n">builder</span> <span class="o">=</span> <span class="n">_require_plot</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dom</span><span class="p">())</span>
+</span><span id="Point.plot-367"><a href="#Point.plot-367"><span class="linenos">367</span></a>        <span class="k">return</span> <span class="n">builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span> <span class="n">panel</span><span class="o">=</span><span class="n">panel</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+</span><span id="Point.plot-368"><a href="#Point.plot-368"><span class="linenos">368</span></a>                       <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Draw this point as a marker.</p>
+
+<p><code>origin</code> is accepted for signature parity with <code><a href="#Vector.plot">Vector.plot()</a></code> and
+is ignored (a point <em>is</em> its position).</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="_GEOMETRY_PLOT_REGISTRY">
+                    <div class="attr variable">
+            <span class="name">_GEOMETRY_PLOT_REGISTRY</span>        =
+<input id="_GEOMETRY_PLOT_REGISTRY-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="_GEOMETRY_PLOT_REGISTRY-view-value"></label><span class="default_value">{(&lt;class &#39;<a href="#Vector">Vector</a>&#39;&gt;, 2): &lt;function _plot_vector_2d&gt;, (&lt;class &#39;<a href="#Vector">Vector</a>&#39;&gt;, 3): &lt;function _plot_vector_3d&gt;, (&lt;class &#39;<a href="#Point">Point</a>&#39;&gt;, 2): &lt;function _plot_point_2d&gt;, (&lt;class &#39;<a href="#Point">Point</a>&#39;&gt;, 3): &lt;function _plot_point_3d&gt;}</span>
+
+        
+    </div>
+    <a class="headerlink" href="#_GEOMETRY_PLOT_REGISTRY"></a>
+    
+    
+
                 </section>
     </main>
 <script>

@@ -66,29 +66,13 @@ class Vector3D(Renderable):
         self.origin = _to_float(origin)
         self.tip = _to_float(tip)
         style.setdefault("color", "black")
-        #style.setdefault("arrowstyle", "-|>")
-        #style.setdefault("mutation_scale", 15)
         style.setdefault("linewidth", 1.5)
         self.style = style
-
-    # def render(self, ax, **kw):
-    #     merged = {**self.style, **kw}
-    #     ox, oy, oz = self.origin
-    #     tx, ty, tz = self.tip
-
-    #     # Project 3D points to 2D display coordinates.
-    #     x0, y0, _ = proj3d.proj_transform(ox, oy, oz, ax.get_proj())
-    #     x1, y1, _ = proj3d.proj_transform(tx, ty, tz, ax.get_proj())
-
-    #     arrow = FancyArrowPatch((x0, y0), (x1, y1),transform=ax.transData, **merged)
-    #     ax.add_patch(arrow)
-    #     return arrow
 
     def render(self, ax, **kw):
         merged = {**self.style, **kw}
         ox, oy, oz = self.origin
         tx, ty, tz = self.tip
-        #return ax.quiver(ox, oy, oz, tx - ox, ty - oy, tz - oz, **merged)
         return ax.quiver(ox, oy, oz, tx - ox, ty - oy, tz - oz, arrow_length_ratio=0.3, **merged)
         # head-size fraction of the arrow
 

@@ -5,5 +5,6 @@ symbolic expressions.
 """
 
 from .function import Function
+from .geometry import Vector, Point
 
-__all__ = ["Function"]
+__all__ = ["Function","Vector","Point"]
