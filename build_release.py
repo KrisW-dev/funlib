@@ -31,6 +31,7 @@ RELEASE_DIR = os.path.join(DIST, RELEASE_NAME)
 
 ANALYSIS_MODULES = [
     "analysis/function.py",
+    "analysis/geometry.py"
 ]
 GRAPHICS_MODULES = [
     "graphics/canvas.py",
@@ -38,9 +39,9 @@ GRAPHICS_MODULES = [
     "graphics/func3d.py",
     "graphics/objects2d.py",
     "graphics/objects3d.py",
+    "graphics/geometry_plots.py",
     "graphics/__init__.py",         # contributes the registry update + __all__
 ]
-
 
 # ---- text helpers ----
 

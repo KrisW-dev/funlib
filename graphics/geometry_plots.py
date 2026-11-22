@@ -15,7 +15,7 @@ pass a ``Point`` to draw the vector *at* that point.  For a ``Point`` there is
 no tail.
 """
 
-from __future__ import annotations
+#from __future__ import annotations
 
 import sympy as sp
 

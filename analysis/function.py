@@ -7,9 +7,9 @@ Function.display(), which falls back to a plain-text rendering if
 IPython is absent. 
 """
 
-from sympy import Matrix, N, latex, shape, integrate as sp_integrate, expand, trigsimp, lambdify
+from sympy import Matrix
+import sympy as sp
 from sympy.core.symbol import Symbol
-#from IPython.display import display as _display, Latex
 
 try:
     from IPython.display import display as _display, Latex
@@ -71,7 +71,7 @@ class Function:
             raise ValueError("Duplicate argument symbols")
         argset = set(args)
         cm = Matrix(coords)
-        m, n = shape(cm)
+        m, n = sp.shape(cm)
         for i in range(m):
             for j in range(n):
                 if not cm[i, j].free_symbols <= argset:
@@ -102,7 +102,7 @@ class Function:
 
     def cod(self):
         """The shape (m, n) of self's matrix of coordinate functions."""
-        return shape(self.coord_matrix)
+        return sp.shape(self.coord_matrix)
 
     def _kind(self):
         """
@@ -110,14 +110,14 @@ class Function:
         'vector'  : $m x 1, m > 1$  (canonical column form)
         'other'     : anything else; not diffable in our setting)
         """
-        m, n = shape(self.coord_matrix)
+        m, n = sp.shape(self.coord_matrix)
         if n != 1:
             return "other"
         return "scalar" if m == 1 else "vector"
 
     def _shape_key(self):
         """Registry key: (_kind, dom, m)."""
-        m, n = shape(self.coord_matrix)
+        m, n = sp.shape(self.coord_matrix)
         return (self._kind(), self.dom(), m)
 
     # ---- evaluation ----
@@ -131,12 +131,12 @@ class Function:
         if len(vals) != len(self.args):
             raise ValueError("Wrong number of arguments")
         sdict = dict(zip(self.args, vals))
-        m, n = shape(self.coord_matrix)
+        m, n = sp.shape(self.coord_matrix)
         if (m, n) == (1, 1):
             c = self.coord_matrix[0, 0].subs(sdict)
-            return c if precision is None else N(c, precision)
+            return c if precision is None else sp.N(c, precision)
         M = self.coord_matrix[:, :].subs(sdict)
-        return M if precision is None else N(M, precision)
+        return M if precision is None else sp.N(M, precision)
 
     def freeze(self, argvals, name=None):
         """
@@ -166,7 +166,7 @@ class Function:
             raise ValueError("freeze() must leave at least one argument free")
 
         if name is None:
-            frozen = ",".join(f"{latex(s)}={latex(v)}" for (s, v) in argvals)
+            frozen = ",".join(f"{sp.latex(s)}={sp.latex(v)}" for (s, v) in argvals)
             name = f"{self._name}|_{{{frozen}}}"
 
         sdict = dict(argvals)
@@ -184,7 +184,7 @@ class Function:
         """
         if self._kind() == "other":
             raise ValueError("diff() is for m x 1 matrices (scalar or vector functions)")
-        return Function("D_" + self._name, self.args, [[c.diff(s) for s in self.args] for c in self.coord_matrix.col(0)],)
+        return Function("D_{" + self._name + "}", self.args, [[c.diff(s) for s in self.args] for c in self.coord_matrix.col(0)],)
 
     def grad(self):
         """
@@ -199,13 +199,172 @@ class Function:
         if self._kind() != "scalar":
             raise ValueError("grad() is only for scalar functions; use diff() otherwise")
         D = self.diff()
-        return Function("\\nabla_" + self._name, self.args, D.coord_matrix.T.tolist())
+        return Function("\\nabla_{" + self._name + "}", self.args, D.coord_matrix.T.tolist())
+
+    def _scalar_expr(self):
+        """The single SymPy expression of a scalar function R^d -> R.
+
+        Assumes _require_implicit() has validated _kind() == "scalar".
+        """
+        return self._coord_matrix[0, 0]
+
+    def _require_implicit(self):
+        """Validate self is a scalar function R^2 -> R (for implicit_diff/tangent_field)."""
+        if self.dom() != 2:
+            raise ValueError(
+                "implicit methods require a function of two variables R^2 -> R; "
+                f"got dom() = {self.dom()}"
+            )
+        if self._kind() != "scalar":
+            raise ValueError(
+                "implicit methods require a scalar-valued function R^2 -> R; "
+                f"got kind = {self._kind()!r}"
+            )
+
+    def _check_level_point(self, level, point):
+        """If point given: assert F(point) == level (symbolically), return (Fx_at, Fy_at).
+
+        Four-way classification:
+        - evaluates finite and equals level -> pass
+        - evaluates finite and differs     -> raise "not on the level set"
+        - evaluates to nan/zoo/oo          -> raise "singular form at point; use sp.limit"
+        - otherwise                        -> raise "could not verify"
+        Pure SymPy: no float coercion.
+        """
+        if point is None:
+            return None, None
+        x0, y0 = point
+        x, y = self._args
+        expr = self._scalar_expr()
+
+        F_at = self.eval(x0, y0)          # bare SymPy scalar for a scalar Function
+        if F_at.has(sp.nan) or F_at.has(sp.zoo) or F_at.has(sp.oo):
+            raise ValueError(
+                f"F({point}) evaluates to {F_at} — the symbolic form is singular "
+                f"there (indeterminate 0/0 or 0*oo). The point may still be on the "
+                f"level set; try sp.limit, or omit point= (or pass on_level=False) "
+                f"to skip this check."
+            )
+        diff = sp.simplify(F_at - level)
+        if diff != 0:
+            if diff.has(sp.nan) or diff.has(sp.zoo) or diff.has(sp.oo):
+                raise ValueError(
+                    f"F({point}) - {level} could not be evaluated to a finite "
+                    f"number; try sp.limit or omit point=."
+                )
+            if diff.free_symbols:
+                raise ValueError(
+                    f"could not verify that {point} is on the level set F = {level} "
+                    f"(F(point) - level did not simplify to 0); use sp.limit or omit point=."
+                )
+            raise ValueError(
+                f"point {point} is not on the level set F = {level} "
+                f"(F(point) = {F_at})"
+            )
+
+        Fx_at = sp.simplify(sp.diff(expr, x).subs({x: x0, y: y0}))
+        Fy_at = sp.simplify(sp.diff(expr, y).subs({x: x0, y: y0}))
+        return Fx_at, Fy_at
+    
+    def implicit_diff(self, level=0, point=None):
+        """Implicit derivative $dy/dx$ along the level set $F(x,y) = \\text{level}$.
+
+        For $F : \\mathbb{R}^2 \\to \\mathbb{R}$ with $F(x, y) = \\text{level}$,
+        returns the scalar function
+
+        $$ \\frac{dy}{dx}F(x,y) = -\\frac{F_x(x,y)}{F_y(x,y)} $$
+
+        The returned function is *meaningful* on the level set $F = \\text{level}$, but is not
+        restricted to it. ``level`` only affects the optional degeneracy check
+        when ``point`` is given.
+
+        Parameters
+        ----------
+        level : sympy.Expr, optional
+            The level set $F = \\text{level}$. Default 0. Used only to validate
+            ``point`` if given.
+        point : tuple, optional
+            If given, assert ``F(point) == level`` and ``dF/dy(point) != 0``.
+            Raises ``ValueError`` otherwise.
+        """
+        self._require_implicit()
+        x, y = self._args
+        expr = self._scalar_expr()
+        Fx = sp.diff(expr, x)
+        Fy = sp.diff(expr, y)
+        if point is not None:
+            _, fy = self._check_level_point(level, point)
+            if fy.is_zero is True:
+                raise ValueError(
+                    f"dF/dy = 0 at {point}; implicit function theorem does not "
+                    f"apply (dy/dx undefined there)"
+                )
+            if fy.is_zero is None:
+                raise ValueError(
+                    f"could not verify dF/dy != 0 at {point}; refusing to assert "
+                    f"the implicit function theorem holds"
+                )
+        return Function(
+            "\\frac{" + "d" + sp.latex(self.args[1]) + "}{" + "d" + sp.latex(self.args[0]) + "}" + self.name,
+            [x, y],
+            [-Fx / Fy],
+        )
+
+    def tangent_field(self, level=0, point=None, orientation="ccw"):
+        """Tangent vector field to the level sets $F = \\text{level}$.
+
+        Returns $(-F_y, F_x)$ for ``orientation="ccw"`` (default) and
+        $(F_y, -F_x)$ for ``orientation="cw"`` — the counterclockwise choice is
+        the positive orientation of Green's theorem. Raw, unnormalized: the
+        magnitude is $|\\nabla F|$.
+
+        ``level`` and ``point`` behave as in :meth:`implicit_diff`; the
+        degeneracy check is $\\nabla F \\ne 0$ rather than $dF/dy \\ne 0$.
+
+        Parameters
+        ----------
+        level : sympy.Expr, optional
+            The level set $F = \\text{level}$. Default 0. Used only to validate
+            ``point`` if given.
+        point : tuple, optional
+            If given, assert ``F(point) == level`` and ``grad F(point) != 0``.
+        orientation : {"ccw", "cw"}, optional
+            Tangent direction. ``"ccw"`` (default) is $(-F_y, F_x)$;
+            ``"cw"`` is $(F_y, -F_x)$.
+        """
+        self._require_implicit()
+        if orientation not in ("ccw", "cw"):
+            raise ValueError(
+                f"orientation must be 'ccw' or 'cw', got {orientation!r}"
+            )
+        x, y = self._args
+        expr = self._scalar_expr()
+        Fx = sp.diff(expr, x)
+        Fy = sp.diff(expr, y)
+        if point is not None:
+            gx, gy = self._check_level_point(level, point)
+            if gx.is_zero is True and gy.is_zero is True:
+                raise ValueError(
+                    f"grad F = 0 at {point}; level set is singular there, "
+                    f"tangent direction undefined"
+                )
+            if gx.is_zero is None or gy.is_zero is None:
+                raise ValueError(
+                    f"could not verify grad F != 0 at {point}; refusing to assert "
+                    f"the level set is regular"
+                )
+        comps = [-Fy, Fx] if orientation == "ccw" else [Fy, -Fx]
+        return Function(
+            "T_{" + self._name + "}",
+            [x, y],
+            comps,
+        )
 
     def _integrate_1d_numeric(self, t_range):
         """Numeric scalar integral over a parameter interval, via scipy.integrate.quad."""
         from scipy.integrate import quad
         t = self.args[0]
-        f = lambdify(t, self.coord_matrix[0, 0], "numpy")
+        f = sp.lambdify(t, self.coord_matrix[0, 0], "numpy")
         result, _ = quad(lambda tv: float(f(tv)),float(t_range[0]), float(t_range[1]))
         return result
 
@@ -226,7 +385,7 @@ class Function:
         if numeric:
             return self._integrate_1d_numeric(t_range)
         t = self.args[0]
-        return sp_integrate(self.coord_matrix[0, 0],(t, t_range[0], t_range[1]))
+        return sp.integrate(self.coord_matrix[0, 0],(t, t_range[0], t_range[1]))
 
     def _integrate_numeric(self, Phi, s_range, t_range):
         import numpy as np
@@ -236,7 +395,7 @@ class Function:
         ys = Phi.coord_matrix[1, 0]
         detJ = Phi.diff().coord_matrix.det()
         integrand_expr = self.coord_matrix[0, 0].subs({self.args[0]: xs, self.args[1]: ys}) * detJ
-        f = lambdify((s, t), integrand_expr, "numpy")
+        f = sp.lambdify((s, t), integrand_expr, "numpy")
         def integrand(t, s):
             return float(f(s, t))
         result, _ = dblquad(integrand,s_range[0], s_range[1],lambda _: t_range[0], lambda _: t_range[1])
@@ -277,7 +436,7 @@ class Function:
         ys = Phi.coord_matrix[1, 0]
         detJ = Phi.diff().coord_matrix.det()
         integrand = self.coord_matrix[0, 0].subs({self.args[0]: xs, self.args[1]: ys}) * detJ
-        return sp_integrate(integrand,(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
+        return sp.integrate(integrand,(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
 
     def _line_integrand(self, gamma):
         """
@@ -320,13 +479,13 @@ class Function:
         if numeric:
             return self._integrate_along_numeric(gamma, t_range)
         t, integrand = self._line_integrand(gamma)
-        return sp_integrate(expand(trigsimp(integrand)),(t, t_range[0], t_range[1]))
+        return sp.integrate(sp.expand(sp.trigsimp(integrand)),(t, t_range[0], t_range[1]))
 
     def _integrate_along_numeric(self, gamma, t_range):
         import numpy as np
         from scipy.integrate import quad
         t, integrand_expr = self._line_integrand(gamma)
-        f = lambdify(t, integrand_expr, "numpy")
+        f = sp.lambdify(t, integrand_expr, "numpy")
         result, _ = quad(lambda tv: float(f(tv)),float(t_range[0]), float(t_range[1]))
         return result
 
@@ -334,7 +493,7 @@ class Function:
         """Numeric flux via scipy.integrate.dblquad. Lazy imports."""
         from scipy.integrate import dblquad
         u, v, integrand_expr = self._flux_integrand(S)
-        f = lambdify((u, v), integrand_expr, "numpy")
+        f = sp.lambdify((u, v), integrand_expr, "numpy")
 
         def integrand(v_val, u_val):          # dblquad: inner u, outer v
             return float(f(u_val, v_val))
@@ -371,7 +530,7 @@ class Function:
             return self._integrate_over_numeric(S, u_range, v_range)
 
         u, v, integrand = self._flux_integrand(S)
-        return sp_integrate(expand(trigsimp(integrand)),
+        return sp.integrate(sp.expand(sp.trigsimp(integrand)),
                             (u, u_range[0], u_range[1]),
                             (v, v_range[0], v_range[1]))
 
@@ -398,8 +557,8 @@ class Function:
         Phi_u = [x_expr.diff(u), y_expr.diff(u), z_expr.diff(u)]
         Phi_v = [x_expr.diff(v), y_expr.diff(v), z_expr.diff(v)]
 
-        f_u = lambdify((u, v), Phi_u, "numpy")
-        f_v = lambdify((u, v), Phi_v, "numpy")
+        f_u = sp.lambdify((u, v), Phi_u, "numpy")
+        f_v = sp.lambdify((u, v), Phi_v, "numpy")
 
         def area_elem(v, u):          # dblquad: inner u, outer v
             pu = np.array(f_u(u, v))
@@ -441,9 +600,9 @@ class Function:
 
         Phi_u = Matrix([x_expr.diff(u), y_expr.diff(u), z_expr.diff(u)])
         Phi_v = Matrix([x_expr.diff(v), y_expr.diff(v), z_expr.diff(v)])
-        area_elem = expand(trigsimp(Phi_u.cross(Phi_v).norm()))
+        area_elem = sp.expand(sp.trigsimp(Phi_u.cross(Phi_v).norm()))
 
-        return sp_integrate(area_elem, (u, u_range[0], u_range[1]),(v, v_range[0], v_range[1]))
+        return sp.integrate(area_elem, (u, u_range[0], u_range[1]),(v, v_range[0], v_range[1]))
         
 
     def volume(self, r_range, s_range, t_range, numeric=True):
@@ -473,8 +632,8 @@ class Function:
         if numeric:
             return self._volume_numeric(r_range, s_range, t_range)
 
-        integrand = expand(trigsimp(detJ))
-        return sp_integrate(integrand,(r, r_range[0], r_range[1]),(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
+        integrand = sp.expand(sp.trigsimp(detJ))
+        return sp.integrate(integrand,(r, r_range[0], r_range[1]),(s, s_range[0], s_range[1]),(t, t_range[0], t_range[1]))
 
     def _volume_numeric(self, r_range, s_range, t_range):
         import numpy as np
@@ -482,7 +641,7 @@ class Function:
 
         r, s, t = self.args
         detJ_expr = self.diff().coord_matrix.det()
-        f_det = lambdify((r, s, t), detJ_expr, "numpy")
+        f_det = sp.lambdify((r, s, t), detJ_expr, "numpy")
 
         def integrand(t, s, r):          # tplquad: inner r, middle s, outer t
             return float(f_det(r, s, t))
@@ -521,12 +680,12 @@ class Function:
             return self._flux_across_numeric(gamma, t_range)
 
         t, integrand = self._flux_across_integrand(gamma)
-        return sp_integrate(expand(trigsimp(integrand)), (t, t_range[0], t_range[1]))
+        return sp.integrate(sp.expand(sp.trigsimp(integrand)), (t, t_range[0], t_range[1]))
 
     def _flux_across_numeric(self, gamma, t_range):
         from scipy.integrate import quad
         t, integrand_expr = self._flux_across_integrand(gamma)
-        f = lambdify(t, integrand_expr, "numpy")
+        f = sp.lambdify(t, integrand_expr, "numpy")
         result, _ = quad(lambda tv: float(f(tv)),
                         float(t_range[0]), float(t_range[1]))
         return result
@@ -605,7 +764,14 @@ class Function:
         return _dispatch(self, plot_classification, **kwargs)
 
     # ==== Display ====
-    
+
+    # _repr_latex_ convention:
+    #   - bare output works only if it starts with \begin{<env>} (MathJax typesets it);
+    #     this is why Function returns a bare \begin{array}...
+    #   - anything else (e.g. SymPy's \left[\begin{matrix}...\end{matrix}\right] for
+    #     a column, or \left(1,\,2\right) for a tuple) must be wrapped in $...$,
+    #     since \left[ and \left( are not recognised environments.
+
     def _repr_latex_(self):
         """
         LaTeX representation for automatic display in Jupyter/IPython.
@@ -624,7 +790,7 @@ class Function:
         else:
             domstr = rbb
 
-        m, n = shape(self.coord_matrix)
+        m, n = sp.shape(self.coord_matrix)
 
         if (m, n) == (1, 1):
             codstr = rbb
@@ -635,14 +801,14 @@ class Function:
                 codstr = rbb + "^{" + str(m) + "\\times" + str(n) + "}"
 
         if len(self.args) == 1:
-            largs = latex(self.args[0])
+            largs = sp.latex(self.args[0])
         else:
-            largs = latex(Matrix(self.args))
+            largs = sp.latex(Matrix(self.args))
 
         if (m, n) == (1, 1):
-            lexpr = latex(self.coord_matrix[0, 0])
+            lexpr = sp.latex(self.coord_matrix[0, 0])
         else:
-            lexpr = latex(self.coord_matrix)
+            lexpr = sp.latex(self.coord_matrix)
 
         return (f"{openingstr} {self._name} : &{domstr} & \\longrightarrow & {codstr} "
                 f"\\\\ & {largs} & \\mapsto & {lexpr} {closingstr}")

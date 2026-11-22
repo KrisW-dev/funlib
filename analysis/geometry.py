@@ -27,10 +27,14 @@ SymPy-only: this module has **no plotting dependencies**.  ``Vector.plot`` and
 for ``Function``).  Import ``analysis`` and ``graphics`` to enable plotting.
 """
 
-from __future__ import annotations
-
 import sympy as sp
 from sympy import ImmutableMatrix, Expr, latex, sympify
+
+try:
+    from IPython.display import display as _display, Latex
+    _HAVE_IPYTHON = True
+except ImportError:
+    _HAVE_IPYTHON = False
 
 
 # ---------------------------------------------------------------------------
@@ -43,6 +47,7 @@ from sympy import ImmutableMatrix, Expr, latex, sympify
 #: ``builder(obj, **style) -> Renderable`` for ``Point``.  They construct a
 #: plot-class instance (``Vector2D``/``Point3D``/...) which the caller adds to a
 #: canvas with ``canvas.add(...)``.
+
 _GEOMETRY_PLOT_REGISTRY: dict = {}
 
 
@@ -219,12 +224,19 @@ class Vector:
 
     # -- display ----------------------------------------------------------
 
+    # _repr_latex_ convention:
+    #   - bare output works only if it starts with \begin{<env>} (MathJax typesets it);
+    #     this is why Function returns a bare \begin{array}...
+    #   - anything else (e.g. SymPy's \left[\begin{matrix}...\end{matrix}\right] for
+    #     a column, or \left(1,\,2\right) for a tuple) must be wrapped in $...$,
+    #     since \left[ and \left( are not recognised environments.
+
     def __repr__(self):
         return f"Vector({list(self.entries())!r})"
 
     def _repr_latex_(self):
-        # SymPy's latex() already emits a bmatrix for a column.
-        return latex(self._m)
+        # SymPy's latex() already emits a bmatrix for a column,
+        return f"${latex(self._m)}$"
 
     def __eq__(self, other):
         if isinstance(other, Vector):
@@ -347,13 +359,21 @@ class Point:
 
     # -- display ----------------------------------------------------------
 
+    # _repr_latex_ convention:
+    #   - bare output works only if it starts with \begin{<env>} (MathJax typesets it);
+    #     this is why Function returns a bare \begin{array}...
+    #   - anything else (e.g. SymPy's \left[\begin{matrix}...\end{matrix}\right] for
+    #     a column, or \left(1,\,2\right) for a tuple) must be wrapped in $...$,
+    #     since \left[ and \left( are not recognised environments.
+
     def __repr__(self):
         return f"Point({list(self.coords())!r})"
 
     def _repr_latex_(self):
         # Horizontal, parentheses:  \left(1,\,2,\,3\right)
-        parts = ",\\,".join(latex(e) for e in self.coords())
-        return rf"\left({parts}\right)"
+        #parts = ",\\,".join(latex(e) for e in self.coords())
+        parts = ",".join(latex(e) for e in self.coords())
+        return f"$\\left({parts}\\right)$"
 
     def __eq__(self, other):
         if isinstance(other, Point):
