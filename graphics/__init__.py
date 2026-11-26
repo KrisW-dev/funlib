@@ -42,7 +42,7 @@ __all__ = [
     # canvas
     "Canvas2D", "Canvas3D", "Renderable",
     # 2D function plots
-    "Curve2D", "ParametricCurve2D", "Implicit2D",
+    "Curve2D", "ParametricCurve2D", "Implicit2D", "VectorField2D",
     # 3D function plots
     "Surface", "ParametricCurve3D", "ParametricSurface3D",
     # 2D objects
